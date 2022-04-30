@@ -1,0 +1,7 @@
+flutter_icons:
+  android: true
+  ios: true
+  adaptive_icon_background: "#FF2196F3"
+  adaptive_icon_foreground: "assets/images/bullsheet_launcher.png"
+  image_path_android: "assets/images/bullsheet_launcher.png"
+  image_path_ios: "assets/images/bullsheet_launcher_white_background.png"
