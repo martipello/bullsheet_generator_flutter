@@ -6,46 +6,7 @@ extension DateTimeExtension on DateTime? {
     return DateTime.utc(thisDate.year, thisDate.month, thisDate.day);
   }
 
-  String bookingTime() {
-    if (this != null) {
-      return DateFormat('HH:mm aaa').format(this!);
-    }
-    return '';
-  }
-
-  String bookingDate() {
-    if (this != null) {
-      final dayOfMonthSuffix = getDayOfMonthSuffix(this!.day);
-      return DateFormat("EEEE d'$dayOfMonthSuffix' MMMM '`'yy").format(this!);
-    }
-    return '';
-  }
-
-  String invoiceDate() {
-    if (this != null) {
-      final dayOfMonthSuffix = getDayOfMonthSuffix(this!.day);
-      return DateFormat("d'$dayOfMonthSuffix' MMMM '`'yy").format(this!);
-    }
-    return '';
-  }
-
-  String dayMonthYearFormat() {
-    if (this != null) {
-      final dayOfMonthSuffix = getDayOfMonthSuffix(this!.day);
-      return DateFormat("d'$dayOfMonthSuffix' MMMM '`'yy").format(this!);
-    }
-    return '';
-  }
-
-  String dayMonthYearTimeFormat() {
-    if (this != null) {
-      final dayOfMonthSuffix = getDayOfMonthSuffix(this!.day);
-      return DateFormat("d'$dayOfMonthSuffix' MMMM '`'yy  'at' HH:mm aaa").format(this!);
-    }
-    return '';
-  }
-
-  DateFormat bookingDateTimeFormat() {
+  DateFormat dateAndTimeFormat() {
     if (this != null) {
       final dayOfMonthSuffix = getDayOfMonthSuffix(this!.day);
       return DateFormat("EEEE d'$dayOfMonthSuffix' MMMM yyyy 'at' HH:mm aaa");
@@ -53,12 +14,12 @@ extension DateTimeExtension on DateTime? {
     return DateFormat("EEEE d MMMM yyyy 'at' HH:mm aaa");
   }
 
-  String bookingDateTime() {
+  DateFormat dateFormat() {
     if (this != null) {
       final dayOfMonthSuffix = getDayOfMonthSuffix(this!.day);
-      return DateFormat("EEEE d'$dayOfMonthSuffix' MMMM yyyy 'at' HH:mm aaa").format(this!);
+      return DateFormat("EEEE d'$dayOfMonthSuffix' MMMM yy");
     }
-    return '';
+    return DateFormat('EEEE d MMMM yy');
   }
 
   String getDayOfMonthSuffix(int dayNum) {

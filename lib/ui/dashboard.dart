@@ -1,15 +1,39 @@
 import 'package:flutter/material.dart';
 
+import '../api/models/job_search_request.dart';
+import '../dependency_injection_container.dart';
 import '../extensions/build_context_extension.dart';
+import '../extensions/date_time_extension.dart';
+import '../view_models/job_search_view_model.dart';
 import 'shared_widgets/bullsheet_app_bar.dart';
 import 'shared_widgets/bullsheet_date_time_field.dart';
 import 'shared_widgets/bullsheet_post_code_text_field.dart';
 import 'shared_widgets/bullsheet_text_field.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  final _jobSearchViewModel = getIt.get<JobSearchViewModel>();
+
   final _formKey = GlobalKey<FormState>();
+
   final jobTitleTextController = TextEditingController();
+
   final postCodeTextController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    jobTitleTextController.addListener(() {
+      _jobSearchViewModel.setJobTitle(jobTitleTextController.text);
+    });
+    postCodeTextController.addListener(() {
+      _jobSearchViewModel.setPostcode(postCodeTextController.text);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,41 +41,57 @@ class Dashboard extends StatelessWidget {
       appBar: BullsheetAppBar(
         label: 'Bullsheet',
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: context.screenWidth * 0.9),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildHeroImage(),
-                  _buildMediumMargin(),
-                  _buildTitleText(context),
-                  _buildLargeMargin(),
-                  _buildSubtitleText(context),
-                  _buildLargeMargin(),
-                  _buildJobTitleTextField(),
-                  _buildMediumMargin(),
-                  _buildPostCodeTextField(),
-                  _buildLargeMargin(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildFromDate(context),
-                      _buildMediumMargin(),
-                      _buildEndDate(context),
-                    ],
-                  )
-                ],
+      body: StreamBuilder<JobSearchRequest>(
+          stream: _jobSearchViewModel.jobSearchStream,
+          builder: (context, snapshot) {
+            final _jobSearchRequest = snapshot.data;
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: context.screenWidth * 0.9),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildHeroImage(),
+                        _buildMediumMargin(),
+                        _buildTitleText(context),
+                        _buildLargeMargin(),
+                        _buildSubtitleText(context),
+                        _buildLargeMargin(),
+                        _buildJobTitleTextField(),
+                        _buildMediumMargin(),
+                        _buildPostCodeTextField(),
+                        _buildLargeMargin(),
+                        _buildDistanceInMilesText(
+                          _jobSearchRequest?.distanceInMiles,
+                        ),
+                        _buildProgressBar(
+                          _jobSearchRequest?.distanceInMiles,
+                        ),
+                        _buildMediumMargin(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildFromDate(context),
+                            _buildMediumMargin(),
+                            _buildEndDate(context),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
-      ),
+            );
+          }),
     );
+  }
+
+  Text _buildDistanceInMilesText(double? distance) {
+    return Text('Distance in miles: ${distance ?? 0}');
   }
 
   Widget _buildPostCodeTextField() {
@@ -128,7 +168,7 @@ class Dashboard extends StatelessWidget {
       context,
       'FROM',
       DateTime.now(),
-      (date) {},
+      _jobSearchViewModel.setFromDate,
     );
   }
 
@@ -139,7 +179,7 @@ class Dashboard extends StatelessWidget {
       context,
       'TO',
       DateTime.now(),
-      (date) {},
+      _jobSearchViewModel.setToDate,
     );
   }
 
@@ -169,10 +209,23 @@ class Dashboard extends StatelessWidget {
             child: BullsheetDateTimeField(
               dateCallback: dateCallback,
               initialDateTime: date,
+              showTimePicker: false,
+              dateFormat: date.dateFormat(),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProgressBar(double? distance) {
+    return Slider(
+      value: distance ?? 0,
+      min: 0,
+      max: 10,
+      divisions: 5,
+      thumbColor: context.colors.secondary,
+      onChanged: _jobSearchViewModel.setDistanceInMiles,
     );
   }
 }

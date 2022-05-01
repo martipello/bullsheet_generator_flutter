@@ -163,7 +163,7 @@ class _BullsheetDateTimeFieldState extends State<BullsheetDateTimeField> {
         if (widget.dateFormat != null) {
           return widget.dateFormat!.format(date);
         } else {
-          return date.bookingDateTime();
+          return date.dateAndTimeFormat().format(date);
         }
       } catch (e) {
         // print('Error formatting date: $e');
