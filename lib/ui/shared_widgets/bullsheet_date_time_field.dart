@@ -43,7 +43,7 @@ class BullsheetDateTimeField extends StatefulWidget {
 }
 
 class _BullsheetDateTimeFieldState extends State<BullsheetDateTimeField> {
-  final _wordskiiDateTimeFieldViewModel = getIt.get<WordskiiDateTimeFieldViewModel>();
+  final _wordskiiDateTimeFieldViewModel = getIt.get<BullsheetDateTimeFieldViewModel>();
 
   @override
   void initState() {
@@ -253,7 +253,7 @@ class _BullsheetDateTimeFieldState extends State<BullsheetDateTimeField> {
   }
 }
 
-class WordskiiDateTimeFieldViewModel {
+class BullsheetDateTimeFieldViewModel {
   final initialDate = BehaviorSubject<DateTime?>();
 
   void setDateTime(DateTime dateTime) {

@@ -5,11 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:json_theme/json_theme.dart';
 
 import 'bullsheet_app.dart';
+import 'dependency_injection_container.dart' as di;
 
 // ignore: avoid_classes_with_only_static_members
 class BullsheetAppWrapper {
   static void init() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await di.init();
     final lightThemeString = await rootBundle.loadString('assets/themes/appainter_theme_light.json');
     final lightThemeJson = jsonDecode(lightThemeString);
     final lightTheme = ThemeDecoder.decodeThemeData(lightThemeJson)!;
