@@ -1,15 +1,21 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../api/models/job_search_request.dart';
+import '../api/models/job_source.dart';
 
 class JobSearchViewModel {
-  final jobSearchStream = BehaviorSubject<JobSearchRequest>();
+  final jobSearchStream = BehaviorSubject<JobSearchRequest>.seeded(
+    JobSearchRequest(
+      (b) => b..jobSource = JobSource.values.toBuiltList().toBuilder(),
+    ),
+  );
 
   void setJobTitle(String? jobTitle) {
-    final jobSearchRequest = jobSearchStream.value;
-    if (jobSearchRequest != null) {
+    final _jobSearchRequest = jobSearchStream.value;
+    if (_jobSearchRequest != null) {
       jobSearchStream.add(
-        jobSearchRequest.rebuild(
+        _jobSearchRequest.rebuild(
           (p0) => p0..jobTitle = jobTitle,
         ),
       );
@@ -23,10 +29,10 @@ class JobSearchViewModel {
   }
 
   void setPostcode(String? postCode) {
-    final jobSearchRequest = jobSearchStream.value;
-    if (jobSearchRequest != null) {
+    final _jobSearchRequest = jobSearchStream.value;
+    if (_jobSearchRequest != null) {
       jobSearchStream.add(
-        jobSearchRequest.rebuild(
+        _jobSearchRequest.rebuild(
           (p0) => p0..postCode = postCode,
         ),
       );
@@ -40,10 +46,10 @@ class JobSearchViewModel {
   }
 
   void setDistanceInMiles(double? distanceInMiles) {
-    final jobSearchRequest = jobSearchStream.value;
-    if (jobSearchRequest != null) {
+    final _jobSearchRequest = jobSearchStream.value;
+    if (_jobSearchRequest != null) {
       jobSearchStream.add(
-        jobSearchRequest.rebuild(
+        _jobSearchRequest.rebuild(
           (p0) => p0..distanceInMiles = distanceInMiles,
         ),
       );
@@ -57,13 +63,24 @@ class JobSearchViewModel {
   }
 
   void setFromDate(DateTime? fromDate) {
-    final jobSearchRequest = jobSearchStream.value;
-    if (jobSearchRequest != null) {
-      jobSearchStream.add(
-        jobSearchRequest.rebuild(
-          (p0) => p0..fromDate = fromDate,
-        ),
-      );
+    final _jobSearchRequest = jobSearchStream.value;
+    if (_jobSearchRequest != null) {
+      final toDate = _jobSearchRequest.toDate ?? DateTime.now();
+      if (fromDate?.isAfter(toDate) == true) {
+        jobSearchStream.add(
+          _jobSearchRequest.rebuild(
+            (p0) => p0
+              ..fromDate = fromDate
+              ..toDate = fromDate,
+          ),
+        );
+      } else {
+        jobSearchStream.add(
+          _jobSearchRequest.rebuild(
+            (p0) => p0..fromDate = fromDate,
+          ),
+        );
+      }
     } else {
       jobSearchStream.add(
         JobSearchRequest(
@@ -74,10 +91,10 @@ class JobSearchViewModel {
   }
 
   void setToDate(DateTime? toDate) {
-    final jobSearchRequest = jobSearchStream.value;
-    if (jobSearchRequest != null) {
+    final _jobSearchRequest = jobSearchStream.value;
+    if (_jobSearchRequest != null) {
       jobSearchStream.add(
-        jobSearchRequest.rebuild(
+        _jobSearchRequest.rebuild(
           (p0) => p0..toDate = toDate,
         ),
       );
@@ -85,6 +102,44 @@ class JobSearchViewModel {
       jobSearchStream.add(
         JobSearchRequest(
           (b) => b..toDate = toDate,
+        ),
+      );
+    }
+  }
+
+  void addJobSource(JobSource jobSource) {
+    final _jobSearchRequest = jobSearchStream.value;
+    if (_jobSearchRequest != null) {
+      final _jobSources = _jobSearchRequest.jobSource.toList();
+      _jobSources.add(jobSource);
+      jobSearchStream.add(
+        _jobSearchRequest.rebuild(
+          (p0) => p0..jobSource = _jobSources.toBuiltList().toBuilder(),
+        ),
+      );
+    } else {
+      jobSearchStream.add(
+        JobSearchRequest(
+          (p0) => p0..jobSource = BuiltList.of([jobSource]).toBuilder(),
+        ),
+      );
+    }
+  }
+
+  void removeJobSource(JobSource jobSource) {
+    final _jobSearchRequest = jobSearchStream.value;
+    if (_jobSearchRequest != null) {
+      final _jobSources = _jobSearchRequest.jobSource.toList();
+      _jobSources.remove(jobSource);
+      jobSearchStream.add(
+        _jobSearchRequest.rebuild(
+          (p0) => p0..jobSource = _jobSources.toBuiltList().toBuilder(),
+        ),
+      );
+    } else {
+      jobSearchStream.add(
+        JobSearchRequest(
+          (p0) => p0..jobSource = BuiltList.of(<JobSource>[]).toBuilder(),
         ),
       );
     }

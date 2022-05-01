@@ -37,10 +37,14 @@ class BullsheetChip extends StatelessWidget {
           labelStyle: context.text.bodyMedium?.copyWith(
             color: context.colors.onPrimary,
           ),
+          side: BorderSide(
+            width: 1,
+            color: context.colors.primary,
+          ),
           onSelected: onSelected,
           selected: isSelected,
           showCheckmark: icon == null,
-          selectedColor: context.colors.secondaryContainer,
+          selectedColor: context.colors.primary,
           checkmarkColor: context.colors.onPrimary,
         ),
       );
@@ -49,6 +53,10 @@ class BullsheetChip extends StatelessWidget {
         height: 32,
         child: Chip(
           label: Text(label),
+          side: BorderSide(
+            width: 1,
+            color: context.colors.primary,
+          ),
           padding: EdgeInsets.zero,
           backgroundColor: context.colors.background,
           labelStyle: context.text.bodyMedium?.copyWith(
