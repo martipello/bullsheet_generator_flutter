@@ -8,6 +8,7 @@ part of 'serializers.dart';
 
 Serializers _$serializers = (new Serializers().toBuilder()
       ..add(ErrorResponse.serializer)
+      ..add(Job.serializer)
       ..add(JobSearchRequest.serializer)
       ..add(JobSource.serializer)
       ..addBuilderFactory(

@@ -1,6 +1,7 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 
+import '../api/models/extensions/job_source_extension.dart';
 import '../api/models/job_search_request.dart';
 import '../api/models/job_source.dart';
 import '../dependency_injection_container.dart';
@@ -299,7 +300,7 @@ class _DashboardState extends State<Dashboard> {
           .map(
             (p0) => BullsheetChip(
               chipType: ChipType.filter,
-              label: p0.name,
+              label: p0.displayName(),
               isSelected: selectedSources.any(
                 (selectedSource) => selectedSource == p0,
               ),

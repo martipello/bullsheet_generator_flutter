@@ -4,6 +4,7 @@ import 'package:built_value/standard_json_plugin.dart';
 
 import '../api_response.dart';
 import '../error_response.dart';
+import '../job.dart';
 import '../job_search_request.dart';
 import '../job_source.dart';
 import 'date_time_serializer.dart';
@@ -14,6 +15,7 @@ part 'serializers.g.dart';
   //models
   ApiResponse,
   ErrorResponse,
+  Job,
   JobSearchRequest,
   JobSource,
 ])
