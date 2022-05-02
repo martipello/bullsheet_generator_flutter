@@ -86,13 +86,14 @@ class _BullsheetDateTimeFieldState extends State<BullsheetDateTimeField> {
                 _buildDateTextExpandedState(snapshot.data, _initialDateTime),
                 if (widget.showResetIcon == true)
                   IconButton(
-                      splashRadius: 24,
-                      icon: Icon(
-                        Icons.close,
-                        color: context.colors.onPrimary,
-                        size: 20,
-                      ),
-                      onPressed: _wordskiiDateTimeFieldViewModel.clear)
+                    splashRadius: 24,
+                    icon: Icon(
+                      Icons.close,
+                      color: context.colors.onPrimary,
+                      size: 20,
+                    ),
+                    onPressed: _wordskiiDateTimeFieldViewModel.clear,
+                  )
               ],
             ),
           ),

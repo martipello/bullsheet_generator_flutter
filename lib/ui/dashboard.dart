@@ -6,6 +6,7 @@ import '../api/models/job_source.dart';
 import '../dependency_injection_container.dart';
 import '../extensions/build_context_extension.dart';
 import '../extensions/date_time_extension.dart';
+import '../extensions/string_extension.dart';
 import '../view_models/job_search_view_model.dart';
 import 'shared_widgets/bottom_button_holder.dart';
 import 'shared_widgets/bullsheet_app_bar.dart';
@@ -13,7 +14,7 @@ import 'shared_widgets/bullsheet_chip.dart';
 import 'shared_widgets/bullsheet_date_time_field.dart';
 import 'shared_widgets/bullsheet_post_code_text_field.dart';
 import 'shared_widgets/bullsheet_text_field.dart';
-import 'shared_widgets/chip_group.dart';
+import 'shared_widgets/chip_group_form_field.dart';
 import 'shared_widgets/rounded_button.dart';
 
 class Dashboard extends StatefulWidget {
@@ -43,15 +44,15 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: BullsheetAppBar(
-        label: 'Bullsheet',
-      ),
-      body: StreamBuilder<JobSearchRequest>(
-        stream: _jobSearchViewModel.jobSearchStream,
-        builder: (context, snapshot) {
-          final _jobSearchRequest = snapshot.data;
-          return SingleChildScrollView(
+    return StreamBuilder<JobSearchRequest>(
+      stream: _jobSearchViewModel.jobSearchStream,
+      builder: (context, snapshot) {
+        final _jobSearchRequest = snapshot.data;
+        return Scaffold(
+          appBar: BullsheetAppBar(
+            label: 'Bullsheet',
+          ),
+          body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Center(
               child: ConstrainedBox(
@@ -100,13 +101,16 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
             ),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomButtonHolder(
-        hasShadow: true,
-        child: _buildContinueButton(),
-      ),
+          ),
+          bottomNavigationBar: BottomButtonHolder(
+            hasShadow: true,
+            child: _buildContinueButton(
+              _jobSearchRequest,
+              false,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -122,7 +126,8 @@ class _DashboardState extends State<Dashboard> {
     return BullsheetPostCodeTextField(
       textController: postCodeTextController,
       validator: (value) {
-        if (value.isAPostCode) {
+        final postCode = value as String?;
+        if (postCode.isPostCode()) {
           return 'Please enter a post code.';
         } else {
           return null;
@@ -280,7 +285,16 @@ class _DashboardState extends State<Dashboard> {
   Widget _buildSourcesChipGroup(
     BuiltList<JobSource> selectedSources,
   ) {
-    return ChipGroup(
+    return ChipGroupFormField(
+      validator: (sources) {
+        if (sources?.isEmpty == true) {
+          return 'Please select at least one source.';
+        } else {
+          return null;
+        }
+      },
+      autoValidateMode: AutovalidateMode.disabled,
+      initialValue: selectedSources.toList(),
       chips: JobSource.values
           .map(
             (p0) => BullsheetChip(
@@ -302,11 +316,16 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildContinueButton() {
+  Widget _buildContinueButton(
+    JobSearchRequest? jobSearchRequest,
+    bool isLoading,
+  ) {
     return RoundedButton(
       label: 'SUBMIT',
       textStyle: context.text.bodyMedium,
-      onPressed: () {},
+      onPressed: () {
+        if (_formKey.currentState!.validate()) {}
+      },
     );
   }
 }
