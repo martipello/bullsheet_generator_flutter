@@ -1,10 +1,16 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../api/models/api_response.dart';
 import '../api/models/job_search_request.dart';
 import '../api/models/job_source.dart';
+import '../repository/bullsheet_repository.dart';
 
 class JobSearchViewModel {
+  JobSearchViewModel(this.bullsheetRepository);
+
+  final BullsheetRepository bullsheetRepository;
+
   final jobSearchStream = BehaviorSubject<JobSearchRequest>.seeded(
     JobSearchRequest(
       (b) => b..jobSource = JobSource.values.toBuiltList().toBuilder(),
@@ -143,5 +149,10 @@ class JobSearchViewModel {
         ),
       );
     }
+  }
+
+  Future<ApiResponse> getJobs() {
+    final _jobSearchRequest = jobSearchStream.value;
+    return bullsheetRepository.scrapeJobSources(_jobSearchRequest);
   }
 }

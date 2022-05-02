@@ -20,6 +20,7 @@ Total Jobs has a search option the query looks like this
 $baseUrl/jobs/sales-assistant/in-ws10-0hx?radius=10
 This is a search for a sales assistant within 10 miles of the postcode
 spaces are not encoded and are replaced with a - fields are self-explanatory other than the "in" query on the postcode.
+Post code must have a space (-) and radius can only be 5 or 10
 
 Indeed tries to change the location when the radius is changed for instance
 searching for the postcode is fine but then changing the radius changes the location to the city the postcode is in

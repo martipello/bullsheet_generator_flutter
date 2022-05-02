@@ -8,6 +8,7 @@ import '../dependency_injection_container.dart';
 import '../extensions/build_context_extension.dart';
 import '../extensions/date_time_extension.dart';
 import '../extensions/string_extension.dart';
+import '../utils/console_output.dart';
 import '../view_models/job_search_view_model.dart';
 import 'shared_widgets/bottom_button_holder.dart';
 import 'shared_widgets/bullsheet_app_bar.dart';
@@ -324,8 +325,10 @@ class _DashboardState extends State<Dashboard> {
     return RoundedButton(
       label: 'SUBMIT',
       textStyle: context.text.bodyMedium,
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {}
+      onPressed: () async {
+        if (_formKey.currentState!.validate()) {
+          final response = await _jobSearchViewModel.getJobs();
+        }
       },
     );
   }
