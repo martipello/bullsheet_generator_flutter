@@ -1,5 +1,6 @@
 import 'package:basic_utils/basic_utils.dart';
 
+import '../../../extensions/string_extension.dart';
 import '../job_search_request.dart';
 import '../job_source.dart';
 
@@ -48,7 +49,7 @@ extension JobSourceExtension on JobSource {
       buffer.write('&qor=$encodeJobTitle');
     }
     if (jobSearchRequest?.postCode?.isNotEmpty == true) {
-      final _postCode = jobSearchRequest?.postCode ?? ''.replaceAll(' ', '');
+      final _postCode = jobSearchRequest?.postCode?.removeWhiteSpace() ?? '';
       final _formatPostCode = StringUtils.addCharAtPosition(_postCode, ' ', _postCode.length - 3);
       final encodePostCode = _formatPostCode.replaceAll(' ', '%20').trim();
       buffer.write('&w=$encodePostCode');
@@ -68,7 +69,7 @@ extension JobSourceExtension on JobSource {
       buffer.write('/$encodeJobTitle');
     }
     if (jobSearchRequest?.postCode?.isNotEmpty == true) {
-      final _postCode = jobSearchRequest?.postCode ?? ''.replaceAll(' ', '');
+      final _postCode = jobSearchRequest?.postCode?.removeWhiteSpace() ?? '';
       final _formatPostCode = StringUtils.addCharAtPosition(_postCode, ' ', _postCode.length - 3);
       final encodePostCode = _formatPostCode.replaceAll(' ', '-').trim();
       buffer.write('/in-$encodePostCode');
@@ -92,7 +93,7 @@ extension JobSourceExtension on JobSource {
       buffer.write('q=$encodeJobTitle');
     }
     if (jobSearchRequest?.postCode?.isNotEmpty == true) {
-      final _postCode = jobSearchRequest?.postCode ?? ''.replaceAll(' ', '');
+      final _postCode = jobSearchRequest?.postCode?.removeWhiteSpace() ?? '';
       final _formatPostCode = StringUtils.addCharAtPosition(_postCode, ' ', _postCode.length - 3);
       final encodePostCode = _formatPostCode.replaceAll(' ', '%20').trim();
       buffer.write('&l=$encodePostCode');

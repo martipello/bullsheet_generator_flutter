@@ -1,4 +1,3 @@
-
 extension StringExtension on String? {
   bool isNotNullOrEmpty() {
     return this?.isNotEmpty == true;
@@ -61,10 +60,13 @@ extension StringExtension on String? {
     return uri.toString();
   }
 
-  bool isPostCode(){
+  bool isPostCode() {
     final postCode = this ?? '';
     final postCodeRegEx = RegExp(r'/^[a-z]{1,2}\d[a-z\d]?\s*\d[a-z]{2}$/i');
     return postCodeRegEx.hasMatch(postCode);
   }
-}
 
+  String removeWhiteSpace() {
+    return this?.replaceAll(RegExp('[ \n\t\r\f]'), '') ?? '';
+  }
+}
