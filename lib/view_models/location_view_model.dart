@@ -17,13 +17,9 @@ class LocationViewModel {
       postCodeStream.add(ApiResponse.loading(null));
       await Future.delayed(const Duration(seconds: 1));
       final location = await _getLastKnownPosition();
-      final address = await placemarkFromCoordinates(
-          location.latitude,
-          location.longitude,
-          localeIdentifier: 'en_UK'
-      );
+      final address = await placemarkFromCoordinates(location.latitude, location.longitude, localeIdentifier: 'en_UK');
       postCodeStream.add(ApiResponse.completed(address.first.postalCode));
-    } catch(e) {
+    } catch (e) {
       postCodeStream.addError(e);
     }
   }

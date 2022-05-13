@@ -1,6 +1,4 @@
-
 extension DoubleExtension on double? {
-
   bool isNotNullNotEmptyAndNotNegative() {
     final value = this;
     if (value != null) {
@@ -18,5 +16,4 @@ extension DoubleExtension on double? {
       return false;
     }
   }
-
 }

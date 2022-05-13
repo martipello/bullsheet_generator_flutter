@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class BottomButtonHolder extends StatelessWidget {
   const BottomButtonHolder({
     Key? key,

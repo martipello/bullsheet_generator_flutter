@@ -1,8 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'flavors.dart';
+import 'ui/archives/archive_page.dart';
 import 'ui/dashboard.dart';
+import 'ui/job_search/job_search_detail_page.dart';
 
 class BullsheetApp extends StatefulWidget {
   const BullsheetApp({
@@ -22,31 +23,12 @@ class _BullsheetAppState extends State<BullsheetApp> {
     return MaterialApp(
       title: F.title,
       theme: widget.theme,
-      home: _flavorBanner(
-        child: Dashboard(),
-        show: kDebugMode,
-      ),
+      routes: {
+        Dashboard.route: (_) => const Dashboard(),
+        JobSearchDetailPage.route: (_) => const JobSearchDetailPage(),
+        ArchivePage.route: (_) => const ArchivePage(),
+      },
+      initialRoute: Dashboard.route,
     );
   }
-
-  Widget _flavorBanner({
-    required Widget child,
-    bool show = true,
-  }) =>
-      show
-          ? Banner(
-              location: BannerLocation.topStart,
-              message: F.name,
-              color: Colors.green.withOpacity(0.6),
-              textStyle: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 12.0,
-                letterSpacing: 1.0,
-              ),
-              textDirection: TextDirection.ltr,
-              child: child,
-            )
-          : Container(
-              child: child,
-            );
 }

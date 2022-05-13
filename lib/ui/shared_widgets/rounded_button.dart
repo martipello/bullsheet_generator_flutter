@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../extensions/build_context_extension.dart';
 import 'bullsheet_loading_widget.dart';
 
-
 class RoundedButton extends StatelessWidget {
   const RoundedButton({
     Key? key,

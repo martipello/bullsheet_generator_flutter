@@ -6,10 +6,10 @@ import 'serializers/serializers.dart';
 part 'job.g.dart';
 
 abstract class Job implements Built<Job, JobBuilder> {
-
-
   factory Job([void Function(JobBuilder) updates]) = _$Job;
   Job._();
+
+  String? get id;
 
   String? get company;
 

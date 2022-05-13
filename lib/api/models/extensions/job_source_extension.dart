@@ -29,7 +29,7 @@ extension JobSourceExtension on JobSource {
     return '';
   }
 
-  String searchQuery(JobSearchRequest? jobSearchRequest){
+  String searchQuery(JobSearchRequest? jobSearchRequest) {
     switch (this) {
       case JobSource.indeed:
         return _indeedSearchQuery(jobSearchRequest);
@@ -41,10 +41,10 @@ extension JobSourceExtension on JobSource {
     return '';
   }
 
-  String _govUkSearchQuery(JobSearchRequest? jobSearchRequest){
+  String _govUkSearchQuery(JobSearchRequest? jobSearchRequest) {
     final buffer = StringBuffer();
     buffer.write('search?adv=1');
-    if(jobSearchRequest?.jobTitle?.isNotEmpty == true){
+    if (jobSearchRequest?.jobTitle?.isNotEmpty == true) {
       final encodeJobTitle = jobSearchRequest?.jobTitle?.replaceAll(' ', '%20').trim();
       buffer.write('&qor=$encodeJobTitle');
     }
@@ -61,10 +61,10 @@ extension JobSourceExtension on JobSource {
     return buffer.toString();
   }
 
-  String _totalJobsSearchQuery(JobSearchRequest? jobSearchRequest){
+  String _totalJobsSearchQuery(JobSearchRequest? jobSearchRequest) {
     final buffer = StringBuffer();
     buffer.write('jobs');
-    if(jobSearchRequest?.jobTitle?.isNotEmpty == true){
+    if (jobSearchRequest?.jobTitle?.isNotEmpty == true) {
       final encodeJobTitle = jobSearchRequest?.jobTitle?.replaceAll(' ', '-').trim();
       buffer.write('/$encodeJobTitle');
     }
@@ -76,7 +76,7 @@ extension JobSourceExtension on JobSource {
     }
     if (jobSearchRequest?.distanceInMiles.toString().isNotEmpty == true) {
       final _distanceInMiles = jobSearchRequest?.distanceInMiles ?? 0;
-      if(_distanceInMiles > 5) {
+      if (_distanceInMiles > 5) {
         buffer.write('?radius=10');
       } else {
         buffer.write('?radius=5');
@@ -85,10 +85,10 @@ extension JobSourceExtension on JobSource {
     return buffer.toString();
   }
 
-  String _indeedSearchQuery(JobSearchRequest? jobSearchRequest){
+  String _indeedSearchQuery(JobSearchRequest? jobSearchRequest) {
     final buffer = StringBuffer();
     buffer.write('jobs?');
-    if(jobSearchRequest?.jobTitle?.isNotEmpty == true){
+    if (jobSearchRequest?.jobTitle?.isNotEmpty == true) {
       final encodeJobTitle = jobSearchRequest?.jobTitle?.replaceAll(' ', '%20').trim();
       buffer.write('q=$encodeJobTitle');
     }

@@ -29,14 +29,14 @@ class ChipGroupFormField extends FormField<List<JobSource>> {
                 ),
                 state.hasError
                     ? Padding(
-                      padding: const EdgeInsets.only(top:8.0),
-                      child: Text(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
                           state.errorText ?? 'Error',
                           style: state.context.text.caption?.copyWith(
                             color: state.context.colors.error,
                           ),
                         ),
-                    )
+                      )
                     : const SizedBox(),
               ],
             );

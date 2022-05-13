@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../extensions/build_context_extension.dart';
 
-
 class NoResults extends StatelessWidget {
   const NoResults({
     Key? key,
@@ -36,8 +35,7 @@ class NoResults extends StatelessWidget {
                 horizontal: 36.0,
               ),
               child: Text(
-                emptyMessage ??
-                    'No Results',
+                emptyMessage ?? 'No Results',
                 style: context.text.bodyMedium,
                 textAlign: TextAlign.center,
               ),

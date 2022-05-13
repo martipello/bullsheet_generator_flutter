@@ -30,7 +30,7 @@ class BullsheetRepository {
     JobSearchRequest? jobSearchRequest,
     JobSource jobSource,
   ) async {
-    switch(jobSource) {
+    switch (jobSource) {
       case JobSource.indeed:
         return _indeedJobElements(jobSearchRequest, jobSource);
       case JobSource.totalJobs:

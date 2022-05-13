@@ -7,10 +7,14 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (new Serializers().toBuilder()
+      ..add(ArchiveModel.serializer)
       ..add(ErrorResponse.serializer)
       ..add(Job.serializer)
       ..add(JobSearchRequest.serializer)
       ..add(JobSource.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(Job)]),
+          () => new ListBuilder<Job>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(JobSource)]),
           () => new ListBuilder<JobSource>()))

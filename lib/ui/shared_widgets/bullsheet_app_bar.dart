@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class BullsheetAppBar extends StatelessWidget implements PreferredSizeWidget {
   BullsheetAppBar({
     this.elevation,
