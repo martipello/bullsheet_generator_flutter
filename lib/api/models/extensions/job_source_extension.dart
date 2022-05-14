@@ -98,7 +98,7 @@ extension JobSourceExtension on JobSource {
       final encodePostCode = _formatPostCode.replaceAll(' ', '%20').trim();
       buffer.write('&l=$encodePostCode');
     }
-    if (jobSearchRequest?.distanceInMiles.toString().isNotEmpty == true) {
+    if (jobSearchRequest?.distanceInMiles != null && jobSearchRequest?.distanceInMiles.toString().isNotEmpty == true) {
       buffer.write('&radius=${jobSearchRequest?.distanceInMiles}');
     }
     return buffer.toString();

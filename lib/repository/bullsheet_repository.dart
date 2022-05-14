@@ -15,13 +15,13 @@ class BullsheetRepository {
     //TODO fix this to be a builder pattern maybe make a object to hold all lists
     final jobSources = jobSearchRequest?.jobSource;
     if (jobSources?.any((p0) => p0 == JobSource.totalJobs) == true) {
-      _scrapeWebPage(jobSearchRequest, JobSource.totalJobs);
+      // _scrapeWebPage(jobSearchRequest, JobSource.totalJobs);
     }
     if (jobSources?.any((p0) => p0 == JobSource.indeed) == true) {
       _scrapeWebPage(jobSearchRequest, JobSource.indeed);
     }
     if (jobSources?.any((p0) => p0 == JobSource.youGov) == true) {
-      _scrapeWebPage(jobSearchRequest, JobSource.youGov);
+      // _scrapeWebPage(jobSearchRequest, JobSource.youGov);
     }
     return ApiResponse.error('');
   }
@@ -52,14 +52,14 @@ class BullsheetRepository {
       final _searchString = jobSource.searchQuery(jobSearchRequest);
       log('URL').d('URL $_baseUrl$_searchString');
       if (await webScraper.loadWebPage(_searchString)) {
-        //TODO scrape page of jobs
-
         final _document = webScraper.getPageContent();
         final _html = html.parse(_document);
-        final _jobListElement = _html.querySelector('#mosaic-provider-jobcards');
-        final _jobs = _jobListElement?.children;
+        final _jobListElement = _html.querySelector('#mosaic-provider-jobcards > ul');
+        final _jobListItems = _jobListElement?.children.where((element) => element.toString() == '<html li>') ?? [];
 
-        log('JOBS').d('JOBS ${_jobs?.map((e) => 'JOB ${e.innerHtml}')}');
+        for(var x in _jobListItems){
+          log('JOBS').d('JOB ${x.innerHtml}');
+        }
 
         return ApiResponse.completed(null);
       } else {
