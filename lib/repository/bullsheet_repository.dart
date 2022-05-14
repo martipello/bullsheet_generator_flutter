@@ -57,8 +57,10 @@ class BullsheetRepository {
         final _jobListElement = _html.querySelector('#mosaic-provider-jobcards > ul');
         final _jobListItems = _jobListElement?.children.where((element) => element.toString() == '<html li>') ?? [];
 
-        for(var x in _jobListItems){
-          log('JOBS').d('JOB ${x.innerHtml}');
+        for(var jobItem in _jobListItems){
+          log('JOBS').d('JOB ${jobItem.innerHtml}');
+          final title = jobItem.querySelector('a');
+          log('JOBS').d('TITLE ${title?.innerHtml}');
         }
 
         return ApiResponse.completed(null);
