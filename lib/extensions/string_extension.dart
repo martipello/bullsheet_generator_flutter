@@ -69,4 +69,12 @@ extension StringExtension on String? {
   String removeWhiteSpace() {
     return this?.replaceAll(RegExp('[ \n\t\r\f]'), '') ?? '';
   }
+
+  String scrapeIndeedId(){
+    if((this?.length ?? 0) > 1){
+      return this?.substring((this?.indexOf('_') ?? 0) + 1, this?.length) ?? '';
+    } else {
+      return '';
+    }
+  }
 }

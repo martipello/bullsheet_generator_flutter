@@ -11,6 +11,8 @@ abstract class Job implements Built<Job, JobBuilder> {
 
   String? get id;
 
+  String? get title;
+
   String? get company;
 
   String? get description;
