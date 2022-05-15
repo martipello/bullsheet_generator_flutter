@@ -107,4 +107,5 @@ extension JobSourceExtension on JobSource {
   String encodeIndeedUrl(String id){
     return '${baseUrl()}viewjob?jk=$id';
   }
+
 }
