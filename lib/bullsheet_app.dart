@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'flavors.dart';
 import 'ui/archives/archive_page.dart';
 import 'ui/dashboard.dart';
+import 'ui/job_search/job_results_page.dart';
 import 'ui/job_search/job_search_detail_page.dart';
 
 class BullsheetApp extends StatefulWidget {
@@ -26,6 +27,7 @@ class _BullsheetAppState extends State<BullsheetApp> {
       routes: {
         Dashboard.route: (_) => const Dashboard(),
         JobSearchDetailPage.route: (_) => const JobSearchDetailPage(),
+        JobResultsPage.route: (_) => JobResultsPage(),
         ArchivePage.route: (_) => const ArchivePage(),
       },
       initialRoute: Dashboard.route,

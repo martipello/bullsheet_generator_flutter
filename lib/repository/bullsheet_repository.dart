@@ -9,10 +9,12 @@ import '../api/models/job.dart';
 import '../api/models/job_search_request.dart';
 import '../api/models/job_source.dart';
 import '../extensions/date_time_extension.dart';
+import '../extensions/element_extension.dart';
 import '../extensions/iterable_extension.dart';
 import '../extensions/job_extension.dart';
 import '../extensions/string_extension.dart';
 import '../utils/console_output.dart';
+import '../utils/constants.dart';
 
 typedef JobBuilder = List<Job> Function(
   JobSearchRequest? jobSearchRequest,
@@ -21,10 +23,10 @@ typedef JobBuilder = List<Job> Function(
 );
 
 class BullsheetRepository {
-  Future<List<ApiResponse<List<Job>>>> getJobs(
+  Future<List<Job>> getJobs(
     JobSearchRequest? jobSearchRequest,
   ) async {
-    return Future.wait<ApiResponse<List<Job>>>(
+    final _jobList = await Future.wait<ApiResponse<List<Job>>>(
       jobSearchRequest?.jobSource.map(
             (source) => _scrapeWebPage(
               _getJobBuilder(source),
@@ -34,6 +36,22 @@ class BullsheetRepository {
           ) ??
           [],
     );
+
+    return _jobList
+        .map<List<Job>>(
+          (response) {
+            log('REPO').d('RESPONSE $response');
+            if (response.status == Status.ERROR) {
+              return [_createErrorJob()];
+            } else {
+              return response.data ?? [];
+            }
+          },
+        )
+        .expand(
+          (job) => job,
+        )
+        .toList();
   }
 
   Future<ApiResponse<List<Job>>> _scrapeWebPage(
@@ -65,8 +83,8 @@ class BullsheetRepository {
   }
 
   JobBuilder _getJobBuilder(
-      JobSource jobSource,
-      ) {
+    JobSource jobSource,
+  ) {
     switch (jobSource) {
       case JobSource.indeed:
         return _createIndeedJobs;
@@ -85,39 +103,50 @@ class BullsheetRepository {
     JobSource jobSource,
   ) {
     var _jobs = <Job>[];
-    final _daysBetween = jobSearchRequest?.fromDate?.getDaysBetween(jobSearchRequest.toDate ?? DateTime.now());
-
     final _jobListElement = _html.querySelector('#mosaic-provider-jobcards > ul');
     final _jobListItems = _jobListElement?.children.where((element) => element.nodeName == 'LI') ?? [];
 
     for (var jobItem in _jobListItems) {
-      final _titleQuery = jobItem.querySelector(
-        'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-        'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2',
-      );
+      //TODO these dont work
+      final _titleQuery = jobItem.indeedTitleQuery();
+      final _urlQuery = jobItem.indeedUrlQuery();
+      final _locationQuery = jobItem.indeedLocationQuery();
+      final _companyQuery = jobItem.indeedCompanyQuery();
 
-      final _urlQuery = jobItem.querySelector(
-        'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-        'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2 > a',
-      );
+      //TODO these do work
 
-      final _locationQuery = jobItem.querySelector(
-        'div.heading6.company_location.tapItem-gutter.companyInfo > div',
-      );
-      final _companyQuery = jobItem.querySelector(
-        'div.heading6.company_location.tapItem-gutter.companyInfo '
-        '> span.companyName > a',
-      );
+      // final _titleQuery = jobItem.querySelector(
+      //   'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
+      //       'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2',
+      // );
+      //
+      // final _urlQuery = jobItem.querySelector(
+      //   'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
+      //       'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2 > a',
+      // );
+      //
+      // final _locationQuery = jobItem.querySelector(
+      //   'div.heading6.company_location.tapItem-gutter.companyInfo > div',
+      // );
+      // final _companyQuery = jobItem.querySelector(
+      //   'div.heading6.company_location.tapItem-gutter.companyInfo '
+      //       '> span.companyName > a',
+      // );
 
-      final _title = _titleQuery?.children.firstWhereOrNull((element) => element.className == 'jcs-JobTitle');
+      log('DATA').d('JOB $jobItem TITLE $_titleQuery');
+
+      final _title = _titleQuery?.children.firstWhereOrNull(
+        (element) => element.className == 'jcs-JobTitle',
+      );
       final _url = _urlQuery?.getAttribute('id')?.scrapeIndeedId();
 
-      if (_title != null) {
+
+      if (_title?.text != null) {
         _jobs.add(
           Job(
             (p0) => p0
               ..id = Job().createJobId()
-              ..title = _title.text
+              ..title = _title?.text
               ..company = _companyQuery?.text
               ..location = _locationQuery?.text ?? ''
               ..url = jobSource.encodeIndeedUrl(_url ?? ''),
@@ -125,8 +154,33 @@ class BullsheetRepository {
         );
       }
     }
+    log('DATA').d('JOBS $_jobs');
 
-    //TODO calculate how many jobs and add from and to dates based on job request and _daysBetween
-    return _jobs;
+    return _jobsWithDates(jobSearchRequest, _jobs);
+  }
+
+  List<Job> _jobsWithDates(
+    JobSearchRequest? jobSearchRequest,
+    List<Job> _jobs,
+  ) {
+    final _daysBetween = jobSearchRequest?.fromDate?.getDaysBetweenFilled(
+          jobSearchRequest.toDate ?? DateTime.now(),
+          _jobs.length,
+        ) ??
+        [];
+
+    return _jobs
+        .mapIndexed(
+          (e, index) => e.rebuild(
+            (p0) => p0..date = (_daysBetween.length > index ? _daysBetween[index] : DateTime.now()),
+          ),
+        )
+        .toList();
+  }
+
+  Job _createErrorJob() {
+    return Job((b) => b
+      ..id = Constants.errorId
+      ..title = 'Bullsheet! Something went wrong.');
   }
 }

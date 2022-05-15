@@ -197,4 +197,34 @@ extension DateTimeExtension on DateTime? {
     days.add(DateTime(endDate.year, endDate.month, endDate.day));
     return days.toSet().toList();
   }
+
+  List<DateTime> getDaysBetweenFilled(DateTime endDate, int filledCount) {
+    final startDate = this ?? DateTime.now();
+    final days = <DateTime>[];
+    final daysCount = endDate.subtract(const Duration(seconds: 1)).difference(startDate).inDays;
+    for (var i = 0; i <= daysCount; i++) {
+      days.add(DateTime(startDate.year, startDate.month, startDate.day + i));
+    }
+    days.add(DateTime(endDate.year, endDate.month, endDate.day));
+
+    final _daysList = days.toSet().toList();
+
+    if(_daysList.length > filledCount){
+      return _daysList.sublist(0, filledCount);
+    }
+    if(_daysList.length == filledCount){
+      return _daysList;
+    }
+
+    final _dateList = <DateTime>[];
+
+    final repetition = filledCount / _daysList.length;
+    for (var date in _daysList) {
+      for (var i = 0; i <= repetition; ++i) {
+        _dateList.add(date);
+      }
+    }
+    return _dateList;
+
+  }
 }

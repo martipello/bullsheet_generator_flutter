@@ -8,6 +8,7 @@ import '../../dependency_injection_container.dart';
 import '../../extensions/build_context_extension.dart';
 import '../../extensions/date_time_extension.dart';
 import '../../extensions/string_extension.dart';
+import '../../view_models/job_result_view_model.dart';
 import '../../view_models/job_search_view_model.dart';
 import '../shared_widgets/bottom_button_holder.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
@@ -17,6 +18,7 @@ import '../shared_widgets/bullsheet_post_code_text_field.dart';
 import '../shared_widgets/bullsheet_text_field.dart';
 import '../shared_widgets/chip_group_form_field.dart';
 import '../shared_widgets/rounded_button.dart';
+import 'job_results_page.dart';
 
 class JobSearchDetailPage extends StatefulWidget {
   const JobSearchDetailPage({Key? key}) : super(key: key);
@@ -29,6 +31,7 @@ class JobSearchDetailPage extends StatefulWidget {
 
 class _JobSearchDetailPageState extends State<JobSearchDetailPage> {
   final _jobSearchViewModel = getIt.get<JobSearchViewModel>();
+  final _jobResultViewModel = getIt.get<JobResultViewModel>();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -320,7 +323,13 @@ class _JobSearchDetailPageState extends State<JobSearchDetailPage> {
       textStyle: context.text.bodyMedium,
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
-          final response = await _jobSearchViewModel.getJobs();
+          _jobResultViewModel.jobSearchRequest = jobSearchRequest;
+          Navigator.of(context).pushNamed(
+            JobResultsPage.route,
+            arguments: JobResultsPageArguments(
+              _jobResultViewModel,
+            ),
+          );
         }
       },
     );

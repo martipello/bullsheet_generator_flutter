@@ -57,13 +57,6 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildMediumMargin() {
-    return const SizedBox(
-      height: 16,
-      width: 16,
-    );
-  }
-
   Widget _buildHeroImage() {
     return Image.asset(
       'assets/images/bullsheet_launcher.png',
