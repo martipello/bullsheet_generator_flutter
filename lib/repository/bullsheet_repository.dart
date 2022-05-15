@@ -9,7 +9,6 @@ import '../api/models/job.dart';
 import '../api/models/job_search_request.dart';
 import '../api/models/job_source.dart';
 import '../extensions/date_time_extension.dart';
-import '../extensions/element_extension.dart';
 import '../extensions/iterable_extension.dart';
 import '../extensions/job_extension.dart';
 import '../extensions/string_extension.dart';
@@ -108,30 +107,30 @@ class BullsheetRepository {
 
     for (var jobItem in _jobListItems) {
       //TODO these dont work
-      final _titleQuery = jobItem.indeedTitleQuery();
-      final _urlQuery = jobItem.indeedUrlQuery();
-      final _locationQuery = jobItem.indeedLocationQuery();
-      final _companyQuery = jobItem.indeedCompanyQuery();
+      // final _titleQuery = jobItem.indeedTitleQuery();
+      // final _urlQuery = jobItem.indeedUrlQuery();
+      // final _locationQuery = jobItem.indeedLocationQuery();
+      // final _companyQuery = jobItem.indeedCompanyQuery();
 
       //TODO these do work
 
-      // final _titleQuery = jobItem.querySelector(
-      //   'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-      //       'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2',
-      // );
-      //
-      // final _urlQuery = jobItem.querySelector(
-      //   'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-      //       'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2 > a',
-      // );
-      //
-      // final _locationQuery = jobItem.querySelector(
-      //   'div.heading6.company_location.tapItem-gutter.companyInfo > div',
-      // );
-      // final _companyQuery = jobItem.querySelector(
-      //   'div.heading6.company_location.tapItem-gutter.companyInfo '
-      //       '> span.companyName > a',
-      // );
+      final _titleQuery = jobItem.querySelector(
+        'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
+            'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2',
+      );
+
+      final _urlQuery = jobItem.querySelector(
+        'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
+            'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2 > a',
+      );
+
+      final _locationQuery = jobItem.querySelector(
+        'div.heading6.company_location.tapItem-gutter.companyInfo > div',
+      );
+      final _companyQuery = jobItem.querySelector(
+        'div.heading6.company_location.tapItem-gutter.companyInfo '
+            '> span.companyName > a',
+      );
 
       log('DATA').d('JOB $jobItem TITLE $_titleQuery');
 

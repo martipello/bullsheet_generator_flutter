@@ -19,6 +19,12 @@ extension IterableExtension<E> on Iterable<E> {
     }
   }
 
+  bool isLastOrFirst(
+    int index,
+  ) {
+    return index != first && index != last;
+  }
+
   E? firstWhereOrNull(bool Function(E element) test) {
     try {
       return firstWhere(test);
@@ -79,6 +85,7 @@ extension IterableExtension<E> on Iterable<E> {
 
 extension NullableIterableExtension<E> on Iterable<E>? {
   bool isNotNullAndIsNotEmpty() => this != null && this!.isNotEmpty == true;
+
   bool isNullOrEmpty() => this == null || this!.isEmpty == true;
 }
 

@@ -51,6 +51,13 @@ class _JobSearchDetailPageState extends State<JobSearchDetailPage> {
   }
 
   @override
+  void dispose() {
+    _jobResultViewModel.dispose();
+    _jobSearchViewModel.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<JobSearchRequest>(
       stream: _jobSearchViewModel.jobSearchStream,

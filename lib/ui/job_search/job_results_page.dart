@@ -24,8 +24,7 @@ class JobResultsPage extends StatefulWidget {
 }
 
 class _JobResultsPageState extends State<JobResultsPage> {
-  JobResultsPageArguments get jobSearchResultPageArguments =>
-      context.routeArguments as JobResultsPageArguments;
+  JobResultsPageArguments get jobSearchResultPageArguments => context.routeArguments as JobResultsPageArguments;
 
   @override
   void initState() {
@@ -91,17 +90,21 @@ class _JobResultsPageState extends State<JobResultsPage> {
   }
 
   Widget _buildJobListView(List<Job> _jobList) {
+    //TODO this crashes too tired to see why sure its obvious, good night
     return RefreshIndicator(
       onRefresh: () async {
         jobSearchResultPageArguments.jobResultViewModel?.getJobs();
       },
       child: CustomScrollView(
         slivers: [
-          SliverAnimatedList(
-            itemBuilder: (context, index, animation) {
-              return _buildJobCard(_jobList[index]);
-            },
-            initialItemCount: _jobList.length,
+          SliverPadding(
+            padding: const EdgeInsets.all(8),
+            sliver: SliverAnimatedList(
+              itemBuilder: (context, index, animation) {
+                return _buildJobCard(_jobList[index]);
+              },
+              initialItemCount: _jobList.length,
+            ),
           ),
         ],
       ),
@@ -109,26 +112,35 @@ class _JobResultsPageState extends State<JobResultsPage> {
   }
 
   Widget _buildJobCard(Job job) {
-    return Material(
-      type: MaterialType.transparency,
-      child: InkWell(
-        onTap: () {},
-        child: Dismissible(
-          key: Key(job.hashCode.toString()),
-          child: BullsheetTile(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(job.title ?? ''),
-              ],
+    return Dismissible(
+      key: Key(job.hashCode.toString()),
+      onDismissed: (direction) {
+        jobSearchResultPageArguments.jobResultViewModel?.removeJob(job);
+      },
+      child: Column(
+        children: [
+          BullsheetTile(
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: () {},
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(job.title ?? ''),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
-          onDismissed: (direction) {
-            //TODO update the list in view model
-          },
-        ),
+          const SizedBox(height: 8,)
+        ],
       ),
     );
   }
+
 }
