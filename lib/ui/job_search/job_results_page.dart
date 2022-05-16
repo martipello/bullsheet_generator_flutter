@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reorderables/reorderables.dart';
 
 import '../../api/models/api_response.dart';
 import '../../api/models/job.dart';
@@ -7,8 +8,8 @@ import '../../view_models/job_result_view_model.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
 import '../shared_widgets/bullsheet_error_widget.dart';
 import '../shared_widgets/bullsheet_loading_widget.dart';
-import '../shared_widgets/bullsheet_tile.dart';
 import '../shared_widgets/no_results.dart';
+import 'job_card.dart';
 
 class JobResultsPageArguments {
   JobResultsPageArguments(this.jobResultViewModel);
@@ -68,29 +69,32 @@ class _JobResultsPageState extends State<JobResultsPage> {
           );
         }
       case Status.ERROR:
-        return RefreshIndicator(
-          onRefresh: () async {
-            jobSearchResultPageArguments.jobResultViewModel?.getJobs();
-          },
-          child: CustomScrollView(
-            slivers: [
-              SliverFillRemaining(
-                child: Center(
-                  child: BullsheetErrorWidget(
-                    errorMessage: snapshot?.message ?? 'All sites had errors.',
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
+        return _buildErrorWidget(snapshot);
       default:
         return const Center(child: BullsheetLoadingWidget());
     }
   }
 
+  Widget _buildErrorWidget(ApiResponse<List<Job>>? snapshot) {
+    return RefreshIndicator(
+        onRefresh: () async {
+          jobSearchResultPageArguments.jobResultViewModel?.getJobs();
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              child: Center(
+                child: BullsheetErrorWidget(
+                  errorMessage: snapshot?.message ?? 'All sites had errors.',
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+  }
+
   Widget _buildJobListView(List<Job> _jobList) {
-    //TODO this crashes too tired to see why sure its obvious, good night
     return RefreshIndicator(
       onRefresh: () async {
         jobSearchResultPageArguments.jobResultViewModel?.getJobs();
@@ -99,11 +103,22 @@ class _JobResultsPageState extends State<JobResultsPage> {
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.all(8),
-            sliver: SliverAnimatedList(
-              itemBuilder: (context, index, animation) {
-                return _buildJobCard(_jobList[index]);
+            sliver: ReorderableSliverList(
+              delegate: ReorderableSliverChildBuilderDelegate(
+                      (context, index) => _buildJobCard(_jobList[index]),
+                childCount: _jobList.length,
+              ),
+              onReorder: (oldIndex, newIndex) {
+                //TODO this is broken
+                if (newIndex > oldIndex) newIndex--;
+                jobSearchResultPageArguments.jobResultViewModel?.removeJob(
+                  _jobList[oldIndex],
+                );
+                jobSearchResultPageArguments.jobResultViewModel?.insertJob(
+                  _jobList[oldIndex],
+                  newIndex,
+                );
               },
-              initialItemCount: _jobList.length,
             ),
           ),
         ],
@@ -112,35 +127,10 @@ class _JobResultsPageState extends State<JobResultsPage> {
   }
 
   Widget _buildJobCard(Job job) {
-    return Dismissible(
+    return JobCard(
       key: Key(job.hashCode.toString()),
-      onDismissed: (direction) {
-        jobSearchResultPageArguments.jobResultViewModel?.removeJob(job);
-      },
-      child: Column(
-        children: [
-          BullsheetTile(
-            child: Material(
-              type: MaterialType.transparency,
-              child: InkWell(
-                onTap: () {},
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(job.title ?? ''),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8,)
-        ],
-      ),
+      job: job,
+      removeJob: jobSearchResultPageArguments.jobResultViewModel?.removeJob,
     );
   }
-
 }

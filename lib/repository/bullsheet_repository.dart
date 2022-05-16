@@ -39,7 +39,6 @@ class BullsheetRepository {
     return _jobList
         .map<List<Job>>(
           (response) {
-            log('REPO').d('RESPONSE $response');
             if (response.status == Status.ERROR) {
               return [_createErrorJob()];
             } else {
@@ -72,11 +71,9 @@ class BullsheetRepository {
         );
         return ApiResponse.completed(_jobs);
       } else {
-        log('ERROR').d('Failed to load page.');
         return ApiResponse.error('Failed to load page.');
       }
     } catch (e) {
-      log('ERROR').d('Failed to load page.');
       return ApiResponse.error(e.toString());
     }
   }
@@ -103,7 +100,10 @@ class BullsheetRepository {
   ) {
     var _jobs = <Job>[];
     final _jobListElement = _html.querySelector('#mosaic-provider-jobcards > ul');
-    final _jobListItems = _jobListElement?.children.where((element) => element.nodeName == 'LI') ?? [];
+    final _jobListItems = _jobListElement?.children.where(
+          (element) => element.nodeName == 'LI',
+        ) ??
+        [];
 
     for (var jobItem in _jobListItems) {
       //TODO these dont work
@@ -116,12 +116,12 @@ class BullsheetRepository {
 
       final _titleQuery = jobItem.querySelector(
         'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-            'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2',
+        'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2',
       );
 
       final _urlQuery = jobItem.querySelector(
         'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-            'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2 > a',
+        'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2 > a',
       );
 
       final _locationQuery = jobItem.querySelector(
@@ -129,7 +129,7 @@ class BullsheetRepository {
       );
       final _companyQuery = jobItem.querySelector(
         'div.heading6.company_location.tapItem-gutter.companyInfo '
-            '> span.companyName > a',
+        '> span.companyName > a',
       );
 
       log('DATA').d('JOB $jobItem TITLE $_titleQuery');
@@ -138,7 +138,6 @@ class BullsheetRepository {
         (element) => element.className == 'jcs-JobTitle',
       );
       final _url = _urlQuery?.getAttribute('id')?.scrapeIndeedId();
-
 
       if (_title?.text != null) {
         _jobs.add(
@@ -153,7 +152,6 @@ class BullsheetRepository {
         );
       }
     }
-    log('DATA').d('JOBS $_jobs');
 
     return _jobsWithDates(jobSearchRequest, _jobs);
   }

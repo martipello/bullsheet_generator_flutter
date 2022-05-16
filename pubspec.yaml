@@ -50,6 +50,7 @@ dependencies:
   logger: ^1.0.0
   web_scraper: ^0.1.4
   basic_utils: ^4.2.0
+  reorderables: ^0.4.4
 
 dev_dependencies:
   flutter_test:

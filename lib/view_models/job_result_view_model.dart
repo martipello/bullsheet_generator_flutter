@@ -26,10 +26,18 @@ class JobResultViewModel {
     }
   }
 
-  Future<void> removeJob(Job job) async {
+  void removeJob(Job job) {
     var _jobList = jobListStream.value?.data;
     if(_jobList != null){
       _jobList.remove(job);
+      jobListStream.add(ApiResponse.completed(_jobList));
+    }
+  }
+
+  void insertJob(Job job, int index) {
+    var _jobList = jobListStream.value?.data;
+    if(_jobList != null){
+      _jobList.insert(index, job);
       jobListStream.add(ApiResponse.completed(_jobList));
     }
   }
