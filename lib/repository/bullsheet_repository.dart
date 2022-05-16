@@ -9,6 +9,7 @@ import '../api/models/job.dart';
 import '../api/models/job_search_request.dart';
 import '../api/models/job_source.dart';
 import '../extensions/date_time_extension.dart';
+import '../extensions/element_extension.dart';
 import '../extensions/iterable_extension.dart';
 import '../extensions/job_extension.dart';
 import '../extensions/string_extension.dart';
@@ -62,6 +63,8 @@ class BullsheetRepository {
       final webScraper = WebScraper(_baseUrl);
       final _searchString = jobSource.searchQuery(jobSearchRequest);
       if (await webScraper.loadWebPage(_searchString)) {
+        log('YOUGOV').d('SCRAPE $_baseUrl$_searchString');
+
         final _document = webScraper.getPageContent();
         final _html = parser.parseHtmlDocument(_document);
         final _jobs = jobBuilder.call(
@@ -87,10 +90,56 @@ class BullsheetRepository {
       case JobSource.totalJobs:
         return _createIndeedJobs;
       case JobSource.youGov:
-        return _createIndeedJobs;
+        return _createYouGovJobs;
       default:
         return (_, _a, _b) => [];
     }
+  }
+
+  List<Job> _createYouGovJobs(
+    JobSearchRequest? jobSearchRequest,
+    html.HtmlDocument _html,
+    JobSource jobSource,
+  ) {
+    var _jobs = <Job>[];
+
+    final _jobListElement = _html.querySelector('#search_results');
+    final _jobListItems = _jobListElement?.children.where(
+          (element) {
+            log('YOUGOV').d('SEARCH RESULTS ${element.innerHtml}');
+            return element.className == 'search-result';
+          },
+        ) ??
+        [];
+
+    log('YOUGOV').d('${_jobListItems.map((e) => 'JOB ${e.innerHtml}')}');
+
+    for (var jobItem in _jobListItems) {
+      final _titleQuery = jobItem.indeedTitleQuery();
+      final _companyQuery = jobItem.indeedCompanyQuery();
+      final _locationQuery = jobItem.indeedLocationQuery();
+      final _urlQuery = jobItem.indeedUrlQuery();
+
+      final _title = _titleQuery?.children.firstWhereOrNull(
+        (element) => element.className == 'jcs-JobTitle',
+      );
+      final _url = _urlQuery?.getAttribute('id')?.scrapeIndeedId();
+
+      if (_title?.text != null) {
+        _jobs.add(
+          Job(
+            (p0) => p0
+              ..id = Job().createJobId()
+              ..title = _title?.text
+              ..company = _companyQuery?.text
+              ..location = _locationQuery?.text ?? ''
+              ..url = jobSource.encodeIndeedUrl(_url ?? ''),
+          ),
+        );
+      }
+    }
+
+    return _jobsWithDates(jobSearchRequest, _jobs);
   }
 
   List<Job> _createIndeedJobs(
@@ -106,33 +155,10 @@ class BullsheetRepository {
         [];
 
     for (var jobItem in _jobListItems) {
-      //TODO these dont work
-      // final _titleQuery = jobItem.indeedTitleQuery();
-      // final _urlQuery = jobItem.indeedUrlQuery();
-      // final _locationQuery = jobItem.indeedLocationQuery();
-      // final _companyQuery = jobItem.indeedCompanyQuery();
-
-      //TODO these do work
-
-      final _titleQuery = jobItem.querySelector(
-        'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-        'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2',
-      );
-
-      final _urlQuery = jobItem.querySelector(
-        'div > div.slider_item > div > table.jobCard_mainContent.big6_visualChanges > tbody > tr > td > '
-        'div.heading4.color-text-primary.singleLineTitle.tapItem-gutter > h2 > a',
-      );
-
-      final _locationQuery = jobItem.querySelector(
-        'div.heading6.company_location.tapItem-gutter.companyInfo > div',
-      );
-      final _companyQuery = jobItem.querySelector(
-        'div.heading6.company_location.tapItem-gutter.companyInfo '
-        '> span.companyName > a',
-      );
-
-      log('DATA').d('JOB $jobItem TITLE $_titleQuery');
+      final _titleQuery = jobItem.indeedTitleQuery();
+      final _companyQuery = jobItem.indeedCompanyQuery();
+      final _locationQuery = jobItem.indeedLocationQuery();
+      final _urlQuery = jobItem.indeedUrlQuery();
 
       final _title = _titleQuery?.children.firstWhereOrNull(
         (element) => element.className == 'jcs-JobTitle',

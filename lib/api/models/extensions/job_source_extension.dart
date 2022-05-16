@@ -51,12 +51,10 @@ extension JobSourceExtension on JobSource {
     if (jobSearchRequest?.postCode?.isNotEmpty == true) {
       final _postCode = jobSearchRequest?.postCode?.removeWhiteSpace() ?? '';
       final _formatPostCode = StringUtils.addCharAtPosition(_postCode, ' ', _postCode.length - 3);
-      final encodePostCode = _formatPostCode.replaceAll(' ', '%20').trim();
+      final encodePostCode = _formatPostCode.replaceAll(' ', '+').trim();
       buffer.write('&w=$encodePostCode');
     }
-    if (jobSearchRequest?.distanceInMiles.toString().isNotEmpty == true) {
-      buffer.write('&d=${jobSearchRequest?.distanceInMiles}');
-    }
+    buffer.write('&d=${jobSearchRequest?.distanceInMiles ?? 5}');
     buffer.write('&pp=50&sb=date&sd=down');
     return buffer.toString();
   }
@@ -74,7 +72,7 @@ extension JobSourceExtension on JobSource {
       final encodePostCode = _formatPostCode.replaceAll(' ', '-').trim();
       buffer.write('/in-$encodePostCode');
     }
-    if (jobSearchRequest?.distanceInMiles.toString().isNotEmpty == true) {
+    if (jobSearchRequest?.distanceInMiles != null && jobSearchRequest?.distanceInMiles.toString().isNotEmpty == true) {
       final _distanceInMiles = jobSearchRequest?.distanceInMiles ?? 0;
       if (_distanceInMiles > 5) {
         buffer.write('?radius=10');

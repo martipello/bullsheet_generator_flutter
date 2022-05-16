@@ -77,21 +77,21 @@ class _JobResultsPageState extends State<JobResultsPage> {
 
   Widget _buildErrorWidget(ApiResponse<List<Job>>? snapshot) {
     return RefreshIndicator(
-        onRefresh: () async {
-          jobSearchResultPageArguments.jobResultViewModel?.getJobs();
-        },
-        child: CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-              child: Center(
-                child: BullsheetErrorWidget(
-                  errorMessage: snapshot?.message ?? 'All sites had errors.',
-                ),
+      onRefresh: () async {
+        jobSearchResultPageArguments.jobResultViewModel?.getJobs();
+      },
+      child: CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            child: Center(
+              child: BullsheetErrorWidget(
+                errorMessage: snapshot?.message ?? 'All sites had errors.',
               ),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildJobListView(List<Job> _jobList) {
@@ -105,7 +105,7 @@ class _JobResultsPageState extends State<JobResultsPage> {
             padding: const EdgeInsets.all(8),
             sliver: ReorderableSliverList(
               delegate: ReorderableSliverChildBuilderDelegate(
-                      (context, index) => _buildJobCard(_jobList[index]),
+                (context, index) => _buildJobCard(_jobList[index]),
                 childCount: _jobList.length,
               ),
               onReorder: (oldIndex, newIndex) {
