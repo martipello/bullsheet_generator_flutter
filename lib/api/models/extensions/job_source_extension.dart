@@ -102,8 +102,7 @@ extension JobSourceExtension on JobSource {
     return buffer.toString();
   }
 
-  String encodeIndeedUrl(String id){
-    return '${baseUrl()}viewjob?jk=$id';
+  String encodeIndeedUrl(String id) {
+    return '${baseUrl()}details/$id';
   }
-
 }

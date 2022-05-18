@@ -19,7 +19,7 @@ class JobResultViewModel {
   Future<void> getJobs() async {
     jobListStream.add(ApiResponse.loading(null));
     final _jobs = await bullsheetRepository.getJobs(jobSearchRequest);
-    if(_jobs.all((element) => element.id == Constants.errorId)) {
+    if (_jobs.all((element) => element.id == Constants.errorId)) {
       jobListStream.add(ApiResponse.error('All sites had errors.'));
     } else {
       jobListStream.add(ApiResponse.completed(_jobs));
@@ -28,7 +28,7 @@ class JobResultViewModel {
 
   void removeJob(Job job) {
     var _jobList = jobListStream.value?.data;
-    if(_jobList != null){
+    if (_jobList != null) {
       _jobList.remove(job);
       jobListStream.add(ApiResponse.completed(_jobList));
     }
@@ -36,7 +36,7 @@ class JobResultViewModel {
 
   void insertJob(Job job, int index) {
     var _jobList = jobListStream.value?.data;
-    if(_jobList != null){
+    if (_jobList != null) {
       _jobList.insert(index, job);
       jobListStream.add(ApiResponse.completed(_jobList));
     }

@@ -209,10 +209,10 @@ extension DateTimeExtension on DateTime? {
 
     final _daysList = days.toSet().toList();
 
-    if(_daysList.length > filledCount){
+    if (_daysList.length > filledCount) {
       return _daysList.sublist(0, filledCount);
     }
-    if(_daysList.length == filledCount){
+    if (_daysList.length == filledCount) {
       return _daysList;
     }
 
@@ -225,6 +225,5 @@ extension DateTimeExtension on DateTime? {
       }
     }
     return _dateList;
-
   }
 }

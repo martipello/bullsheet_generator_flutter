@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../api/models/job.dart';
 import '../../dependency_injection_container.dart';
 import '../../extensions/build_context_extension.dart';
+import '../../extensions/date_time_extension.dart';
 import '../../services/launch_service.dart';
 import '../shared_widgets/bullsheet_tile.dart';
 
@@ -53,23 +54,26 @@ class JobCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        job.title ?? '',
+                        job.title?.trim() ?? '',
                         style: context.text.titleSmall,
+                        textAlign: TextAlign.start,
                       ),
-                      if (job.company?.isNotEmpty == true)
+                      if (job.company?.trim().isNotEmpty == true)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            '${job.company}',
+                            '${job.company?.trim()}',
                             style: context.text.bodyMedium,
+                            textAlign: TextAlign.start,
                           ),
                         ),
-                      if (job.location?.isNotEmpty == true)
+                      if (job.location?.trim().isNotEmpty == true)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            '${job.location}',
+                            '${job.location?.trim()}',
                             style: context.text.bodyMedium,
+                            textAlign: TextAlign.start,
                           ),
                         ),
                       if (job.url?.isNotEmpty == true)
@@ -80,11 +84,30 @@ class JobCard extends StatelessWidget {
                               _launchService.launchEvent(job.url ?? '', context);
                             },
                             child: Text(
-                              '${job.url}',
+                              '${job.url?.trim()}',
                               style: context.text.bodyMedium?.copyWith(
                                 color: Colors.blue,
                               ),
+                              textAlign: TextAlign.start,
                             ),
+                          ),
+                        ),
+                      if (job.datePosted?.trim().isNotEmpty == true)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Posted: ${job.datePosted?.trim()}',
+                            style: context.text.bodyMedium,
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
+                      if (job.dateApplied != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Applied: ${job.dateApplied?.dateFormat().format(job.dateApplied ?? DateTime.now())}',
+                            style: context.text.bodyMedium,
+                            textAlign: TextAlign.start,
                           ),
                         ),
                     ],

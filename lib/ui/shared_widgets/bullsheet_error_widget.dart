@@ -69,5 +69,4 @@ class BullsheetErrorWidget extends StatelessWidget {
       ),
     );
   }
-
 }

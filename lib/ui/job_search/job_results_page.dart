@@ -85,7 +85,7 @@ class _JobResultsPageState extends State<JobResultsPage> {
           SliverFillRemaining(
             child: Center(
               child: BullsheetErrorWidget(
-                errorMessage: snapshot?.message ?? 'All sites had errors.',
+                errorMessage: snapshot?.message ?? 'All selected sites had errors.',
               ),
             ),
           ),

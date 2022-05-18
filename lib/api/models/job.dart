@@ -23,7 +23,9 @@ abstract class Job implements Built<Job, JobBuilder> {
 
   String? get url;
 
-  DateTime? get date;
+  DateTime? get dateApplied;
+
+  String? get datePosted;
 
   Map<String, dynamic> toJson() {
     return serializers.serializeWith(Job.serializer, this) as Map<String, dynamic>;

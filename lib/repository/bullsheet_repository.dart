@@ -5,7 +5,7 @@ import 'package:web_scraper/web_scraper.dart';
 
 import '../api/models/api_response.dart';
 import '../api/models/extensions/job_source_extension.dart';
-import '../api/models/job.dart';
+import '../api/models/job.dart' as jb;
 import '../api/models/job_search_request.dart';
 import '../api/models/job_source.dart';
 import '../extensions/date_time_extension.dart';
@@ -16,17 +16,17 @@ import '../extensions/string_extension.dart';
 import '../utils/console_output.dart';
 import '../utils/constants.dart';
 
-typedef JobBuilder = List<Job> Function(
+typedef JobBuilder = List<jb.Job> Function(
   JobSearchRequest? jobSearchRequest,
   html.HtmlDocument htmlDocument,
   JobSource jobSource,
 );
 
 class BullsheetRepository {
-  Future<List<Job>> getJobs(
+  Future<List<jb.Job>> getJobs(
     JobSearchRequest? jobSearchRequest,
   ) async {
-    final _jobList = await Future.wait<ApiResponse<List<Job>>>(
+    final _jobList = await Future.wait<ApiResponse<List<jb.Job>>>(
       jobSearchRequest?.jobSource.map(
             (source) => _scrapeWebPage(
               _getJobBuilder(source),
@@ -37,8 +37,8 @@ class BullsheetRepository {
           [],
     );
 
-    return _jobList
-        .map<List<Job>>(
+    final flattenList = _jobList
+        .map<List<jb.Job>>(
           (response) {
             if (response.status == Status.ERROR) {
               return [_createErrorJob()];
@@ -51,9 +51,19 @@ class BullsheetRepository {
           (job) => job,
         )
         .toList();
+    final today = DateTime.now();
+    flattenList.sort(
+      (firstJob, secondJob) => firstJob.dateApplied?.isBefore(
+                secondJob.dateApplied ?? today,
+              ) ==
+              true
+          ? 1
+          : 0,
+    );
+    return flattenList;
   }
 
-  Future<ApiResponse<List<Job>>> _scrapeWebPage(
+  Future<ApiResponse<List<jb.Job>>> _scrapeWebPage(
     JobBuilder jobBuilder,
     JobSearchRequest? jobSearchRequest,
     JobSource jobSource,
@@ -96,45 +106,41 @@ class BullsheetRepository {
     }
   }
 
-  List<Job> _createYouGovJobs(
+  List<jb.Job> _createYouGovJobs(
     JobSearchRequest? jobSearchRequest,
     html.HtmlDocument _html,
     JobSource jobSource,
   ) {
-    var _jobs = <Job>[];
+    var _jobs = <jb.Job>[];
 
     final _jobListElement = _html.querySelector('#search_results');
     final _jobListItems = _jobListElement?.children.where(
-          (element) {
-            log('YOUGOV').d('SEARCH RESULTS ${element.innerHtml}');
-            return element.className == 'search-result';
-          },
+          (element) => element.className == 'search-result',
         ) ??
         [];
 
-    log('YOUGOV').d('${_jobListItems.map((e) => 'JOB ${e.innerHtml}')}');
-
     for (var jobItem in _jobListItems) {
-      final _titleQuery = jobItem.indeedTitleQuery();
-      final _companyQuery = jobItem.indeedCompanyQuery();
-      final _locationQuery = jobItem.indeedLocationQuery();
-      final _urlQuery = jobItem.indeedUrlQuery();
+      final _jobBuilder = jb.JobBuilder();
+      _jobBuilder.id = jb.Job().createJobId();
+      final _titleQuery = jobItem.querySelector('h3 > a');
+      final details = jobItem.querySelectorAll('ul > li');
+      if (details.isNotEmpty) {
+        final _date = details[0];
+        _jobBuilder.datePosted = _date.text;
+      }
+      if (details.length > 1) {
+        final _company = details[1];
+        final _companyAndLocation = _company.text?.split('-');
+        _jobBuilder.company = _companyAndLocation?.first;
+        _jobBuilder.location = _companyAndLocation?.last;
+      }
+      _jobBuilder.title = _titleQuery?.innerHtml?.trim();
+      final _urlQuery = jobItem.querySelector('govuk-link');
+      _jobBuilder.url = jobSource.encodeIndeedUrl(_urlQuery?.text ?? '');
 
-      final _title = _titleQuery?.children.firstWhereOrNull(
-        (element) => element.className == 'jcs-JobTitle',
-      );
-      final _url = _urlQuery?.getAttribute('id')?.scrapeIndeedId();
-
-      if (_title?.text != null) {
+      if (_jobBuilder.title != null) {
         _jobs.add(
-          Job(
-            (p0) => p0
-              ..id = Job().createJobId()
-              ..title = _title?.text
-              ..company = _companyQuery?.text
-              ..location = _locationQuery?.text ?? ''
-              ..url = jobSource.encodeIndeedUrl(_url ?? ''),
-          ),
+          _jobBuilder.build(),
         );
       }
     }
@@ -142,12 +148,12 @@ class BullsheetRepository {
     return _jobsWithDates(jobSearchRequest, _jobs);
   }
 
-  List<Job> _createIndeedJobs(
+  List<jb.Job> _createIndeedJobs(
     JobSearchRequest? jobSearchRequest,
     html.HtmlDocument _html,
     JobSource jobSource,
   ) {
-    var _jobs = <Job>[];
+    var _jobs = <jb.Job>[];
     final _jobListElement = _html.querySelector('#mosaic-provider-jobcards > ul');
     final _jobListItems = _jobListElement?.children.where(
           (element) => element.nodeName == 'LI',
@@ -167,9 +173,9 @@ class BullsheetRepository {
 
       if (_title?.text != null) {
         _jobs.add(
-          Job(
+          jb.Job(
             (p0) => p0
-              ..id = Job().createJobId()
+              ..id = jb.Job().createJobId()
               ..title = _title?.text
               ..company = _companyQuery?.text
               ..location = _locationQuery?.text ?? ''
@@ -182,9 +188,9 @@ class BullsheetRepository {
     return _jobsWithDates(jobSearchRequest, _jobs);
   }
 
-  List<Job> _jobsWithDates(
+  List<jb.Job> _jobsWithDates(
     JobSearchRequest? jobSearchRequest,
-    List<Job> _jobs,
+    List<jb.Job> _jobs,
   ) {
     final _daysBetween = jobSearchRequest?.fromDate?.getDaysBetweenFilled(
           jobSearchRequest.toDate ?? DateTime.now(),
@@ -195,14 +201,14 @@ class BullsheetRepository {
     return _jobs
         .mapIndexed(
           (e, index) => e.rebuild(
-            (p0) => p0..date = (_daysBetween.length > index ? _daysBetween[index] : DateTime.now()),
+            (p0) => p0..dateApplied = (_daysBetween.length > index ? _daysBetween[index] : DateTime.now()),
           ),
         )
         .toList();
   }
 
-  Job _createErrorJob() {
-    return Job((b) => b
+  jb.Job _createErrorJob() {
+    return jb.Job((b) => b
       ..id = Constants.errorId
       ..title = 'Bullsheet! Something went wrong.');
   }

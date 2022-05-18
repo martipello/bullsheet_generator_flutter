@@ -150,7 +150,7 @@ class JobSearchViewModel {
     }
   }
 
-  void dispose(){
+  void dispose() {
     jobSearchStream.close();
   }
 }
