@@ -86,7 +86,7 @@ class ArchiveRepository {
     return Future.value(<ArchiveModel>[]);
   }
 
-  Future<ArchiveModel?> getTimesheet(
+  Future<ArchiveModel?> getArchive(
     String id,
   ) async {
     final box = await _openArchiveBox();

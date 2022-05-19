@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 
+import 'repository/archive_repository.dart';
 import 'repository/bullsheet_repository.dart';
 import 'services/launch_service.dart';
 import 'ui/shared_widgets/bullsheet_date_time_field.dart';
@@ -13,7 +14,8 @@ Future<void> init() async {
   getIt.registerLazySingleton(BullsheetRepository.new);
   getIt.registerFactory(LaunchService.new);
   getIt.registerFactory(BullsheetDateTimeFieldViewModel.new);
+  getIt.registerFactory(ArchiveRepository.new);
   getIt.registerFactory(LocationViewModel.new);
   getIt.registerFactory(() => JobSearchViewModel(getIt()));
-  getIt.registerFactory(() => JobResultViewModel(getIt()));
+  getIt.registerFactory(() => JobResultViewModel(getIt(), getIt()));
 }

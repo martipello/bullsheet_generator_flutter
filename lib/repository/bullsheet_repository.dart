@@ -1,6 +1,5 @@
 import 'package:universal_html/html.dart' as html;
 import 'package:universal_html/parsing.dart' as parser;
-
 import 'package:web_scraper/web_scraper.dart';
 
 import '../api/models/api_response.dart';
@@ -27,17 +26,41 @@ class BullsheetRepository {
     JobSearchRequest? jobSearchRequest,
   ) async {
     final _jobList = await Future.wait<ApiResponse<List<jb.Job>>>(
-      jobSearchRequest?.jobSource.map(
-            (source) => _scrapeWebPage(
-              _getJobBuilder(source),
-              jobSearchRequest,
-              source,
-            ),
-          ) ??
-          [],
+      _scapeWebPages(jobSearchRequest),
     );
+    final flattenList = _flattenJobLists(_jobList);
+    _sortByAppliedDate(flattenList);
+    return flattenList;
+  }
 
-    final flattenList = _jobList
+  Iterable<Future<ApiResponse<List<jb.Job>>>> _scapeWebPages(
+    JobSearchRequest? jobSearchRequest,
+  ) {
+    return jobSearchRequest?.jobSource.map(
+          (source) => _scrapeWebPage(
+            _getJobBuilder(source),
+            jobSearchRequest,
+            source,
+          ),
+        ) ??
+        [];
+  }
+
+  void _sortByAppliedDate(
+    List<jb.Job> flattenList,
+  ) {
+    final today = DateTime.now();
+    flattenList.sort(
+      (firstJob, secondJob) => (firstJob.dateApplied ?? today).compareTo(
+        secondJob.dateApplied ?? today,
+      ),
+    );
+  }
+
+  List<jb.Job> _flattenJobLists(
+    List<ApiResponse<List<jb.Job>>> _jobList,
+  ) {
+    return _jobList
         .map<List<jb.Job>>(
           (response) {
             if (response.status == Status.ERROR) {
@@ -51,16 +74,6 @@ class BullsheetRepository {
           (job) => job,
         )
         .toList();
-    final today = DateTime.now();
-    flattenList.sort(
-      (firstJob, secondJob) => firstJob.dateApplied?.isBefore(
-                secondJob.dateApplied ?? today,
-              ) ==
-              true
-          ? 1
-          : 0,
-    );
-    return flattenList;
   }
 
   Future<ApiResponse<List<jb.Job>>> _scrapeWebPage(
@@ -73,8 +86,6 @@ class BullsheetRepository {
       final webScraper = WebScraper(_baseUrl);
       final _searchString = jobSource.searchQuery(jobSearchRequest);
       if (await webScraper.loadWebPage(_searchString)) {
-        log('YOUGOV').d('SCRAPE $_baseUrl$_searchString');
-
         final _document = webScraper.getPageContent();
         final _html = parser.parseHtmlDocument(_document);
         final _jobs = jobBuilder.call(
@@ -98,12 +109,66 @@ class BullsheetRepository {
       case JobSource.indeed:
         return _createIndeedJobs;
       case JobSource.totalJobs:
-        return _createIndeedJobs;
+        return _createTotalJobsJobs;
       case JobSource.youGov:
         return _createYouGovJobs;
       default:
         return (_, _a, _b) => [];
     }
+  }
+
+  List<jb.Job> _createTotalJobsJobs(
+      JobSearchRequest? jobSearchRequest,
+      html.HtmlDocument _html,
+      JobSource jobSource,
+      ) {
+    log('JOB SEARCH LIST').d('HTML ${_html.documentElement?.innerHtml}');
+    var _jobs = <jb.Job>[];
+    //#job-item-97580752 > div.sc-fznNTe.kxgehf > div.sc-fzooss.kBgtGS > a > h2
+    //#app-unifiedResultlist-f446933b-d786-4d37-bfdd-c8cf9babb66b > div > div.container > div > div.ResultsWrapper-sc-h54hyq-2.cjTGHz.col-lg-9
+    final _jobListElement = _html.querySelector('div > div.container > div');
+
+    log('JOB SEARCH LIST').d('_jobListElement ${_jobListElement?.innerHtml}');
+
+    final _jobListItems = _jobListElement?.children.where(
+          (element) => element.className == 'search-result',
+    ) ??
+        [];
+
+    for (var jobItem in _jobListItems) {
+      final _jobBuilder = jb.JobBuilder();
+      _jobBuilder.id = jb.Job().createJobId();
+      final _titleQuery = jobItem.querySelector('h3 > a');
+      final _details = jobItem.querySelectorAll('ul > li');
+      if (_details.isNotEmpty) {
+        final _date = _details[0];
+        _jobBuilder.datePosted = _date.text;
+      }
+      if (_details.length > 1) {
+        final _company = _details[1];
+        final _companyAndLocation = _company.text?.split('-');
+        _jobBuilder.company = _companyAndLocation?.first;
+        _jobBuilder.location = _companyAndLocation?.last;
+      }
+      _jobBuilder.title = _titleQuery?.innerHtml?.trim();
+
+      for (var child in jobItem.children) {
+        for (var childChild in child.children) {
+          if (childChild.attributes.containsKey('href')) {
+            final _url = childChild.attributes['href'].toString();
+            _jobBuilder.url = _url;
+          }
+        }
+      }
+
+      if (_jobBuilder.title != null) {
+        _jobs.add(
+          _jobBuilder.build(),
+        );
+      }
+    }
+
+    return _jobsWithDates(jobSearchRequest, _jobs);
   }
 
   List<jb.Job> _createYouGovJobs(
@@ -137,9 +202,9 @@ class BullsheetRepository {
       _jobBuilder.title = _titleQuery?.innerHtml?.trim();
 
       for (var child in jobItem.children) {
-        for(var childrensChild in child.children) {
-          if(childrensChild.attributes.containsKey('href')) {
-            final _url = childrensChild.attributes['href'].toString();
+        for (var childChild in child.children) {
+          if (childChild.attributes.containsKey('href')) {
+            final _url = childChild.attributes['href'].toString();
             _jobBuilder.url = _url;
           }
         }
@@ -186,7 +251,9 @@ class BullsheetRepository {
               ..title = _title?.text
               ..company = _companyQuery?.text
               ..location = _locationQuery?.text ?? ''
-              ..url = jobSource.encodeIndeedUrl(_url ?? ''),
+              ..url = jobSource.encodeIndeedUrl(
+                _url ?? '',
+              ),
           ),
         );
       }

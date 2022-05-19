@@ -45,14 +45,28 @@ class _JobResultsPageState extends State<JobResultsPage> {
             label: 'RESULTS',
           ),
           body: _buildState(snapshot.data),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {},
-            child: const Icon(
-              Icons.save,
+          floatingActionButton:
+              snapshot.data?.status == Status.COMPLETED ? _buildFloatingActionButton() : const SizedBox(),
+        );
+      },
+    );
+  }
+
+  Widget _buildFloatingActionButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'List successfully saved.',
             ),
           ),
         );
       },
+      child: const Icon(
+        Icons.save,
+      ),
     );
   }
 
