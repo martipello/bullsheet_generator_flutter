@@ -51,23 +51,27 @@ class JobResultViewModel {
     }
   }
 
-  void archiveJobs() {
+  ArchiveModel? archiveJobs() {
     var _jobList = jobListStream.value?.data;
     if (_jobList != null) {
       final now = DateTime.now();
       final _id = now.toIso8601String();
       final name = now.dateFormat().format(now);
-      archiveRepository.saveArchive(
-        ArchiveModel(
-          (b) => b
-            ..id = _id
-            ..name = name
-            ..createdDate = now
-            ..updatedDate = now
-            ..color = Colors.white
-            ..jobList = _jobList.toBuiltList().toBuilder(),
-        ),
+      final _archiveModel = ArchiveModel(
+            (b) => b
+          ..id = _id
+          ..name = name
+          ..createdDate = now
+          ..updatedDate = now
+          ..color = Colors.white
+          ..jobList = _jobList.toBuiltList().toBuilder(),
       );
+      archiveRepository.saveArchive(
+          _archiveModel
+      );
+      return _archiveModel;
+    } else {
+      return null;
     }
   }
 

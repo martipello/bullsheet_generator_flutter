@@ -5,6 +5,7 @@ import '../../api/models/api_response.dart';
 import '../../api/models/job.dart';
 import '../../extensions/build_context_extension.dart';
 import '../../view_models/job_result_view_model.dart';
+import '../archives/archive_page.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
 import '../shared_widgets/bullsheet_error_widget.dart';
 import '../shared_widgets/bullsheet_loading_widget.dart';
@@ -55,14 +56,16 @@ class _JobResultsPageState extends State<JobResultsPage> {
   Widget _buildFloatingActionButton() {
     return FloatingActionButton(
       onPressed: () {
-        jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'List successfully saved.',
-            ),
-          ),
-        );
+        final archiveModel = jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
+        //TODO add archiveModel to page arguments, modify the stack so pressing back sends you to the archive page
+        Navigator.of(context).pushNamed(ArchivePage.route);
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //     content: Text(
+        //       'List successfully saved.',
+        //     ),
+        //   ),
+        // );
       },
       child: const Icon(
         Icons.save,
