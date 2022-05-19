@@ -123,20 +123,27 @@ class BullsheetRepository {
       final _jobBuilder = jb.JobBuilder();
       _jobBuilder.id = jb.Job().createJobId();
       final _titleQuery = jobItem.querySelector('h3 > a');
-      final details = jobItem.querySelectorAll('ul > li');
-      if (details.isNotEmpty) {
-        final _date = details[0];
+      final _details = jobItem.querySelectorAll('ul > li');
+      if (_details.isNotEmpty) {
+        final _date = _details[0];
         _jobBuilder.datePosted = _date.text;
       }
-      if (details.length > 1) {
-        final _company = details[1];
+      if (_details.length > 1) {
+        final _company = _details[1];
         final _companyAndLocation = _company.text?.split('-');
         _jobBuilder.company = _companyAndLocation?.first;
         _jobBuilder.location = _companyAndLocation?.last;
       }
       _jobBuilder.title = _titleQuery?.innerHtml?.trim();
-      final _urlQuery = jobItem.querySelector('govuk-link');
-      _jobBuilder.url = jobSource.encodeIndeedUrl(_urlQuery?.text ?? '');
+
+      for (var child in jobItem.children) {
+        for(var childrensChild in child.children) {
+          if(childrensChild.attributes.containsKey('href')) {
+            final _url = childrensChild.attributes['href'].toString();
+            _jobBuilder.url = _url;
+          }
+        }
+      }
 
       if (_jobBuilder.title != null) {
         _jobs.add(
