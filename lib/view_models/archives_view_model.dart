@@ -1,4 +1,5 @@
-import 'package:rxdart/subjects.dart';
+
+import 'package:rxdart/rxdart.dart';
 
 import '../api/models/api_response.dart';
 import '../api/models/archive_model.dart';
@@ -18,6 +19,22 @@ class ArchivesViewModel {
       archivesStream.add(ApiResponse.completed(archiveModelList));
     } else {
       archivesStream.add(ApiResponse.error('Couldn\'t find archives. Please try again.'));
+    }
+  }
+
+  void removeArchiveModel(ArchiveModel archiveModel) {
+    var _archiveModelList = archivesStream.value?.data;
+    if (_archiveModelList != null) {
+      _archiveModelList.remove(archiveModel);
+      archivesStream.add(ApiResponse.completed(_archiveModelList));
+    }
+  }
+
+  void insertArchiveModel(ArchiveModel archiveModel, int index) {
+    var _archiveModelList = archivesStream.value?.data;
+    if (_archiveModelList != null) {
+      _archiveModelList.insert(index, archiveModel);
+      archivesStream.add(ApiResponse.completed(_archiveModelList));
     }
   }
 

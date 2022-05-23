@@ -6,8 +6,10 @@ import '../../api/models/archive_model.dart';
 import '../../dependency_injection_container.dart';
 import '../../extensions/iterable_extension.dart';
 import '../../view_models/archives_view_model.dart';
+import '../dashboard.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
 import '../shared_widgets/bullsheet_loading_widget.dart';
+import 'archive_page.dart';
 import 'archive_tile.dart';
 
 class ArchivesPage extends StatefulWidget {
@@ -40,21 +42,38 @@ class _ArchivesPageState extends State<ArchivesPage> {
         builder: (context, snapshot) {
           final _status = snapshot.data?.status;
           final _archiveList = snapshot.data?.data ?? [];
-          if(_status == Status.LOADING) {
-            return const Center(child: BullsheetLoadingWidget(),);
+          if (_status == Status.LOADING) {
+            return const Center(
+              child: BullsheetLoadingWidget(),
+            );
           }
-          if(_status == Status.ERROR) {
-            return const Center(child: Text('That\'s an error'),);
+          if (_status == Status.ERROR) {
+            return const Center(
+              child: Text('That\'s an error'),
+            );
           }
-          if(_status == Status.COMPLETED && _archiveList.isEmpty) {
-            return const Center(child: Text('No Results'),);
+          if (_status == Status.COMPLETED && _archiveList.isEmpty) {
+            return const Center(
+              child: Text('No Results'),
+            );
           }
 
           return ReorderableItemsView(
-            crossAxisCount: 2,
+            crossAxisCount: 4,
             isGrid: true,
             longPressToDrag: true,
-            onReorder: (oldIndex, newIndex) {},
+            onReorder: (oldIndex, newIndex) {
+              _archivesViewModel.removeArchiveModel(
+                _archiveList[oldIndex],
+              );
+              _archivesViewModel.insertArchiveModel(
+                _archiveList[oldIndex],
+                newIndex,
+              );
+            },
+            feedBackWidgetBuilder: (context, index, child) {
+              return Center(child: child);
+            },
             staggeredTiles: _archiveList
                 .mapIndexed<StaggeredTileExtended>(
                   (e, i) => StaggeredTileExtended.count(
@@ -65,44 +84,40 @@ class _ArchivesPageState extends State<ArchivesPage> {
                 .toList(),
             children: _archiveList
                 .mapIndexed<Widget>(
-                  (e, i) => ArchiveTile(
-                    key: ValueKey(
-                      _archiveList[i].hashCode,
-                    ),
-                    archive: _archiveList[i],
-                  ),
+                  (e, i) => _buildArchiveTextTile(_archiveList, i),
                 )
                 .toList(),
           );
-          return CustomScrollView(
-            slivers: [
-              if (_archiveList.isEmpty)
-                const SliverFillRemaining(
-                  child: Center(
-                    child: Text(
-                      'No Results',
-                    ),
-                  ),
-                ),
-              ReorderableItemsView(
-                crossAxisCount: 2,
-                isGrid: true,
-                longPressToDrag: true,
-                onReorder: (oldIndex, newIndex) {},
-                children: _archiveList
-                    .mapIndexed<Widget>(
-                      (e, i) => ArchiveTile(
-                        key: ValueKey(
-                          _archiveList[i].hashCode,
-                        ),
-                        archive: _archiveList[i],
-                      ),
-                    )
-                    .toList(),
-              )
-            ],
-          );
         },
+      ),
+    );
+  }
+
+  ArchiveTile _buildArchiveTile(
+    ArchiveModel _archive,
+  ) {
+    return ArchiveTile(
+      key: ValueKey(
+        _archive.hashCode,
+      ),
+      archive: _archive,
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          ArchivePage.route,
+          arguments: ArchivePageArguments(_archive.id),
+        );
+      },
+    );
+  }
+
+  Widget _buildArchiveTextTile(
+    List<ArchiveModel> _archiveList,
+    int i,
+  ) {
+    return Text(
+      _archiveList[i].name ?? '',
+      key: ValueKey(
+        _archiveList[i].hashCode,
       ),
     );
   }

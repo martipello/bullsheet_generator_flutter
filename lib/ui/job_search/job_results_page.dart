@@ -6,6 +6,8 @@ import '../../api/models/job.dart';
 import '../../extensions/build_context_extension.dart';
 import '../../view_models/job_result_view_model.dart';
 import '../archives/archive_page.dart';
+import '../archives/archives_page.dart';
+import '../dashboard.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
 import '../shared_widgets/bullsheet_error_widget.dart';
 import '../shared_widgets/bullsheet_loading_widget.dart';
@@ -56,9 +58,17 @@ class _JobResultsPageState extends State<JobResultsPage> {
   Widget _buildFloatingActionButton() {
     return FloatingActionButton(
       onPressed: () {
-        final archiveModel = jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
-        //TODO add archiveModel to page arguments, modify the stack so pressing back sends you to the archive page
-        Navigator.of(context).pushNamed(ArchivePage.route);
+        final _archive = jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
+        Navigator.of(context).popUntil(
+              (route) => route.settings.name == Dashboard.route,
+        );
+        Navigator.of(context).pushNamed(
+          ArchivesPage.route,
+        );
+        Navigator.of(context).pushNamed(
+          ArchivePage.route,
+          arguments: ArchivePageArguments(_archive?.id),
+        );
       },
       child: const Icon(
         Icons.save,

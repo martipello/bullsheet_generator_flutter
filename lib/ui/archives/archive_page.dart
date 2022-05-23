@@ -8,9 +8,9 @@ import '../../view_models/archive_view_model.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
 
 class ArchivePageArguments {
-  ArchivePageArguments(this.archiveModel);
+  ArchivePageArguments(this.archiveModelId);
 
-  final ArchiveModel? archiveModel;
+  final String? archiveModelId;
 }
 
 class ArchivePage extends StatefulWidget {
@@ -29,7 +29,7 @@ class _ArchivePageState extends State<ArchivePage> {
   @override
   void initState() {
     Future.delayed(Duration.zero).then((value) {
-      _archiveViewModel.getArchiveModelForId(archivePageArguments.archiveModel?.id ?? '');
+      _archiveViewModel.getArchiveModelForId(archivePageArguments.archiveModelId ?? '');
     });
     super.initState();
   }
@@ -55,7 +55,7 @@ class _ArchivePageState extends State<ArchivePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text('ARCHIVES'),
+                    const Text('ARCHIVE'),
                   ],
                 ),
               ),
