@@ -59,13 +59,6 @@ class _JobResultsPageState extends State<JobResultsPage> {
         final archiveModel = jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
         //TODO add archiveModel to page arguments, modify the stack so pressing back sends you to the archive page
         Navigator.of(context).pushNamed(ArchivePage.route);
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(
-        //     content: Text(
-        //       'List successfully saved.',
-        //     ),
-        //   ),
-        // );
       },
       child: const Icon(
         Icons.save,

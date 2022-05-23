@@ -62,7 +62,7 @@ class BullsheetChip extends StatelessWidget {
           labelStyle: context.text.bodyMedium?.copyWith(
             color: context.colors.onPrimary,
           ),
-          useDeleteButtonTooltip: isSelected,
+          deleteButtonTooltipMessage: isSelected ? 'Delete' : '',
           deleteIconColor: context.colors.onPrimary,
           onDeleted: isSelected ? onDelete : null,
           deleteIcon: Icon(

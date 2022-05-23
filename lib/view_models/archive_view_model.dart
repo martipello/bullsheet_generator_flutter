@@ -20,4 +20,8 @@ class ArchiveViewModel {
       archiveStream.add(ApiResponse.error('Couldn\'t find archive. Please try again.'));
     }
   }
+
+  void dispose () {
+    archiveStream.close();
+  }
 }

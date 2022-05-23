@@ -1,8 +1,8 @@
-import 'package:bullsheet_generator/ui/archives/archives_page.dart';
 import 'package:flutter/material.dart';
 
 import 'flavors.dart';
 import 'ui/archives/archive_page.dart';
+import 'ui/archives/archives_page.dart';
 import 'ui/dashboard.dart';
 import 'ui/job_search/job_results_page.dart';
 import 'ui/job_search/job_search_detail_page.dart';
@@ -30,7 +30,7 @@ class _BullsheetAppState extends State<BullsheetApp> {
         JobSearchDetailPage.route: (_) => const JobSearchDetailPage(),
         JobResultsPage.route: (_) => JobResultsPage(),
         ArchivePage.route: (_) => const ArchivePage(),
-        ArchivesPage.route: (_) => const ArchivesPage(),
+        ArchivesPage.route: (_) => ArchivesPage(),
       },
       initialRoute: Dashboard.route,
     );

@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -56,15 +55,14 @@ class JobResultViewModel {
     if (_jobList != null) {
       final now = DateTime.now();
       final _id = now.toIso8601String();
-      final name = now.dateFormat().format(now);
       final _archiveModel = ArchiveModel(
             (b) => b
           ..id = _id
-          ..name = name
+          ..name = 'New Job List'
           ..createdDate = now
           ..updatedDate = now
-          ..color = Colors.white
-          ..jobList = _jobList.toBuiltList().toBuilder(),
+          ..color = Colors.white.value
+          ..jobList = _jobList,
       );
       archiveRepository.saveArchive(
           _archiveModel

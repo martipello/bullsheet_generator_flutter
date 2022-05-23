@@ -58,7 +58,7 @@ class ArchiveRepository {
     return Future.value(0);
   }
 
-  Future<List<ArchiveModel>> getArchiveModels({
+  Future<List<ArchiveModel>?> getArchiveModels({
     String? search,
   }) async {
     final box = await _openArchiveBox();

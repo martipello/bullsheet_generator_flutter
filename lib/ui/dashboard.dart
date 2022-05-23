@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../extensions/build_context_extension.dart';
-import 'archives/archive_page.dart';
+import 'archives/archives_page.dart';
 import 'job_search/job_search_detail_page.dart';
 import 'shared_widgets/bullsheet_app_bar.dart';
 import 'shared_widgets/rounded_button.dart';
@@ -86,7 +86,7 @@ class _DashboardState extends State<Dashboard> {
       label: 'ARCHIVES',
       textStyle: context.text.bodyMedium,
       onPressed: () async {
-        Navigator.of(context).pushNamed(ArchivePage.route);
+        Navigator.of(context).pushNamed(ArchivesPage.route);
       },
     );
   }
