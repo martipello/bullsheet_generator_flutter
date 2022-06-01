@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:reorderables/reorderables.dart';
 
 import '../../api/models/api_response.dart';
 import '../../api/models/archive_model.dart';
+import '../../api/models/job.dart';
 import '../../dependency_injection_container.dart';
 import '../../extensions/build_context_extension.dart';
 import '../../view_models/archive_view_model.dart';
+import '../job_search/job_card.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
+import '../shared_widgets/bullsheet_text_field.dart';
 
 class ArchivePageArguments {
   ArchivePageArguments(this.archiveModelId);
@@ -24,13 +28,25 @@ class ArchivePage extends StatefulWidget {
 
 class _ArchivePageState extends State<ArchivePage> {
   final _archiveViewModel = getIt.get<ArchiveViewModel>();
-  ArchivePageArguments get archivePageArguments => context.routeArguments as ArchivePageArguments;
+  final _titleTextController = TextEditingController();
+
+  ArchivePageArguments get archivePageArguments =>
+      context.routeArguments as ArchivePageArguments;
 
   @override
   void initState() {
-    Future.delayed(Duration.zero).then((value) {
-      _archiveViewModel.getArchiveModelForId(archivePageArguments.archiveModelId ?? '');
-    });
+    Future.delayed(Duration.zero).then(
+      (value) {
+        _archiveViewModel
+            .getArchiveModelForId(
+              archivePageArguments.archiveModelId ?? '',
+            )
+            .then(
+              (_archive) =>
+                  _titleTextController.text = _archive?.name ?? 'New Job List',
+            );
+      },
+    );
     super.initState();
   }
 
@@ -44,25 +60,61 @@ class _ArchivePageState extends State<ArchivePage> {
         stream: _archiveViewModel.archiveStream,
         builder: (context, snapshot) {
           final _archive = snapshot.data?.data;
+          final _jobList = _archive?.jobList ?? [];
           final _state = snapshot.data?.status;
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: context.screenWidth * 0.9,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text('ARCHIVE'),
-                  ],
+          return CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                    top: 32,
+                  ),
+                  child: BullsheetTextField(
+                    textController: _titleTextController,
+                    labelText: 'Title',
+                    style: context.text.titleLarge,
+                  ),
                 ),
               ),
-            ),
+              SliverPadding(
+                padding: const EdgeInsets.only(
+                  right: 8,
+                  left: 8,
+                  bottom: 8,
+                ),
+                sliver: ReorderableSliverList(
+                  delegate: ReorderableSliverChildBuilderDelegate(
+                    (context, index) => _buildJobCard(_jobList[index]),
+                    childCount: _jobList.length,
+                  ),
+                  onReorder: (oldIndex, newIndex) {
+                    //TODO this is broken
+                    if (newIndex > oldIndex) newIndex--;
+                    _archiveViewModel.removeJob(
+                      _jobList[oldIndex],
+                    );
+                    _archiveViewModel.insertJob(
+                      _jobList[oldIndex],
+                      newIndex,
+                    );
+                  },
+                ),
+              ),
+            ],
           );
-        }
+        },
       ),
+    );
+  }
+
+  Widget _buildJobCard(Job job) {
+    return JobCard(
+      key: Key(job.hashCode.toString()),
+      job: job,
+      removeJob: _archiveViewModel.removeJob,
     );
   }
 }

@@ -84,7 +84,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                 .toList(),
             children: _archiveList
                 .mapIndexed<Widget>(
-                  (e, i) => _buildArchiveTextTile(_archiveList, i),
+                  (e, i) => _buildArchiveTile(_archiveList[i]),
                 )
                 .toList(),
           );
@@ -110,15 +110,4 @@ class _ArchivesPageState extends State<ArchivesPage> {
     );
   }
 
-  Widget _buildArchiveTextTile(
-    List<ArchiveModel> _archiveList,
-    int i,
-  ) {
-    return Text(
-      _archiveList[i].name ?? '',
-      key: ValueKey(
-        _archiveList[i].hashCode,
-      ),
-    );
-  }
 }

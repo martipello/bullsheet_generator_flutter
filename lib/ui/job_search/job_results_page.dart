@@ -11,6 +11,7 @@ import '../dashboard.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
 import '../shared_widgets/bullsheet_error_widget.dart';
 import '../shared_widgets/bullsheet_loading_widget.dart';
+import '../shared_widgets/bullsheet_text_field.dart';
 import '../shared_widgets/no_results.dart';
 import 'job_card.dart';
 
@@ -29,6 +30,7 @@ class JobResultsPage extends StatefulWidget {
 
 class _JobResultsPageState extends State<JobResultsPage> {
   JobResultsPageArguments get jobSearchResultPageArguments => context.routeArguments as JobResultsPageArguments;
+  final _titleTextController = TextEditingController();
 
   @override
   void initState() {
@@ -102,6 +104,21 @@ class _JobResultsPageState extends State<JobResultsPage> {
       },
       child: CustomScrollView(
         slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                top: 32,
+              ),
+              child: BullsheetTextField(
+                textController: _titleTextController,
+                labelText: 'Title',
+                style: context.text.titleLarge,
+              ),
+            ),
+          ),
           SliverFillRemaining(
             child: Center(
               child: BullsheetErrorWidget(

@@ -19,11 +19,13 @@ class BullsheetTextField extends StatelessWidget {
     this.loading = false,
     this.isDense = true,
     this.isEnabled = true,
+    this.style,
   }) : super(key: key);
 
   final TextEditingController textController;
   final Validator? validator;
   final String labelText;
+  final TextStyle? style;
   final String? validatorMessage;
   final IconData? prefixIcon;
   final TextInputType? textInputType;
@@ -38,12 +40,14 @@ class BullsheetTextField extends StatelessWidget {
     return TextFormField(
       controller: textController,
       maxLines: maxLines,
-      style: context.text.bodyMedium,
+      style: style ?? context.text.bodyMedium,
       textInputAction: textInputAction,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: textInputType,
       decoration: _buildInputDecoration(context),
-      onEditingComplete: textInputAction == TextInputAction.next ? () => context.nextEditableTextFocus() : null,
+      onEditingComplete: textInputAction == TextInputAction.next
+          ? () => context.nextEditableTextFocus()
+          : null,
       validator: validator != null
           ? validator
           : validatorMessage != null
