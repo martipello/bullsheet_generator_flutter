@@ -5,6 +5,7 @@ import 'package:reorderables/reorderables.dart';
 import '../../api/models/api_response.dart';
 import '../../api/models/job.dart';
 import '../../extensions/build_context_extension.dart';
+import '../../utils/console_output.dart';
 import '../../view_models/job_result_view_model.dart';
 import '../archives/archives_page.dart';
 import '../dashboard.dart';
@@ -152,7 +153,6 @@ class _JobResultsPageState extends State<JobResultsPage> {
                 childCount: _jobList.length,
               ),
               onReorder: (oldIndex, newIndex) {
-                //TODO this is broken
                 if (newIndex > oldIndex) newIndex--;
                 jobSearchResultPageArguments.jobResultViewModel?.moveJob(
                   _jobList[oldIndex],
@@ -167,6 +167,7 @@ class _JobResultsPageState extends State<JobResultsPage> {
   }
 
   Widget _buildJobCard(Job job) {
+    log('_buildJobCard').d('HASH ${job.hashCode.toString()}');
     return JobCard(
       key: Key(job.hashCode.toString()),
       job: job,

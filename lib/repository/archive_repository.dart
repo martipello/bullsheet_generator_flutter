@@ -13,10 +13,10 @@ class ArchiveRepository {
   }
 
   Future<void> saveArchive(
-    Archive archiveModel,
+    Archive? archiveModel,
   ) async {
     final box = await _openArchiveBox();
-    if (box != null) {
+    if (box != null && archiveModel != null) {
       box.put(archiveModel.id, archiveModel);
     }
   }

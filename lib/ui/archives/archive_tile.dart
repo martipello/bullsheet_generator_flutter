@@ -17,12 +17,14 @@ class ArchiveTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorInt = archive?.color ?? 0xFFFFFFFF;
     return Material(
       type: MaterialType.transparency,
       child: InkWell(
         onTap: onTap,
         child: BullsheetTile(
           isSelected: false,
+          backgroundColor: Color(colorInt),
           border: RoundedRectangleBorder(
             side: BorderSide(
               color: Color(archive?.color ?? Colors.white.value),

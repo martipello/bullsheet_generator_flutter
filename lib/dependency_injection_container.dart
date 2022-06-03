@@ -18,7 +18,7 @@ Future<void> init() async {
   getIt.registerFactory(LaunchService.new);
   getIt.registerFactory(BullsheetDateTimeFieldViewModel.new);
   getIt.registerFactory(LocationViewModel.new);
-  getIt.registerFactory(() => ArchiveViewModel(getIt()));
+  getIt.registerFactory(() => ArchiveViewModel(getIt(), getIt()));
   getIt.registerFactory(() => ArchivesViewModel(getIt()));
   getIt.registerFactory(() => JobSearchViewModel(getIt()));
   getIt.registerFactory(() => JobResultViewModel(getIt(), getIt()));

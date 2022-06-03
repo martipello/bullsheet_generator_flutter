@@ -97,11 +97,14 @@ class _ArchivesPageState extends State<ArchivesPage> {
         _archive.hashCode,
       ),
       archive: _archive,
-      onTap: () {
-        Navigator.of(context).pushNamed(
+      onTap: () async {
+        final refresh = await Navigator.of(context).pushNamed(
           ArchivePage.route,
           arguments: ArchivePageArguments(_archive.id),
         );
+        if(refresh == true){
+          _archivesViewModel.getArchives();
+        }
       },
     );
   }

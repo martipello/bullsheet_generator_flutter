@@ -37,10 +37,14 @@ class JobResultViewModel {
   }
 
   void removeJob(Job job) {
-    var _jobList = jobListStream.value?.data;
+    var _jobList = jobListStream.value?.data?.toList();
     if (_jobList != null) {
-      _jobList.toList().remove(job);
-      jobListStream.add(ApiResponse.completed(_jobList));
+      _jobList.remove(job);
+      jobListStream.add(
+        ApiResponse.completed(
+          _jobList.toBuiltList(),
+        ),
+      );
     }
   }
 

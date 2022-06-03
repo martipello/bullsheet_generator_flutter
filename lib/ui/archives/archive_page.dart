@@ -31,22 +31,31 @@ class _ArchivePageState extends State<ArchivePage> {
   final _archiveViewModel = getIt.get<ArchiveViewModel>();
   final _titleTextController = TextEditingController();
 
-  ArchivePageArguments get archivePageArguments => context.routeArguments as ArchivePageArguments;
+  ArchivePageArguments get archivePageArguments =>
+      context.routeArguments as ArchivePageArguments;
 
   @override
   void initState() {
     Future.delayed(Duration.zero).then(
       (value) {
         _archiveViewModel
-            .getArchiveModelForId(
+            .getArchiveForId(
               archivePageArguments.archiveModelId ?? '',
             )
             .then(
-              (_archive) => _titleTextController.text = _archive?.name ?? 'New Job List',
+              (_archive) =>
+                  _titleTextController.text = _archive?.name ?? 'New Job List',
             );
       },
     );
+    addListener();
     super.initState();
+  }
+
+  void addListener() {
+    _titleTextController.addListener(() {
+      _archiveViewModel.archiveName = _titleTextController.text;
+    });
   }
 
   @override
@@ -90,21 +99,27 @@ class _ArchivePageState extends State<ArchivePage> {
                     childCount: _jobList.length,
                   ),
                   onReorder: (oldIndex, newIndex) {
-                    //TODO this is broken
                     if (newIndex > oldIndex) newIndex--;
-                    _archiveViewModel.removeJob(
-                      _jobList[oldIndex],
-                    );
-                    _archiveViewModel.insertJob(
-                      _jobList[oldIndex],
-                      newIndex,
-                    );
+                    _archiveViewModel.moveJob(_jobList[oldIndex], newIndex);
                   },
                 ),
               ),
             ],
           );
         },
+      ),
+      floatingActionButton: _buildFloatingActionButton(),
+    );
+  }
+
+  Widget _buildFloatingActionButton() {
+    return FloatingActionButton(
+      onPressed: () {
+        _archiveViewModel.updateArchive();
+        Navigator.of(context).pop(true);
+      },
+      child: const Icon(
+        Icons.save,
       ),
     );
   }
