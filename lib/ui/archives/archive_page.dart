@@ -1,8 +1,9 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
 
 import '../../api/models/api_response.dart';
-import '../../api/models/archive_model.dart';
+import '../../api/models/archive.dart';
 import '../../api/models/job.dart';
 import '../../dependency_injection_container.dart';
 import '../../extensions/build_context_extension.dart';
@@ -30,8 +31,7 @@ class _ArchivePageState extends State<ArchivePage> {
   final _archiveViewModel = getIt.get<ArchiveViewModel>();
   final _titleTextController = TextEditingController();
 
-  ArchivePageArguments get archivePageArguments =>
-      context.routeArguments as ArchivePageArguments;
+  ArchivePageArguments get archivePageArguments => context.routeArguments as ArchivePageArguments;
 
   @override
   void initState() {
@@ -42,8 +42,7 @@ class _ArchivePageState extends State<ArchivePage> {
               archivePageArguments.archiveModelId ?? '',
             )
             .then(
-              (_archive) =>
-                  _titleTextController.text = _archive?.name ?? 'New Job List',
+              (_archive) => _titleTextController.text = _archive?.name ?? 'New Job List',
             );
       },
     );
@@ -56,11 +55,11 @@ class _ArchivePageState extends State<ArchivePage> {
       appBar: BullsheetAppBar(
         label: 'Bullsheet',
       ),
-      body: StreamBuilder<ApiResponse<ArchiveModel?>>(
+      body: StreamBuilder<ApiResponse<Archive?>>(
         stream: _archiveViewModel.archiveStream,
         builder: (context, snapshot) {
           final _archive = snapshot.data?.data;
-          final _jobList = _archive?.jobList ?? [];
+          final _jobList = _archive?.jobList ?? BuiltList.of([]);
           final _state = snapshot.data?.status;
           return CustomScrollView(
             slivers: [

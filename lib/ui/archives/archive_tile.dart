@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../api/models/archive_model.dart';
+import '../../api/models/archive.dart';
 import '../../extensions/build_context_extension.dart';
 import '../../extensions/date_time_extension.dart';
 import '../shared_widgets/bullsheet_tile.dart';
@@ -12,7 +12,7 @@ class ArchiveTile extends StatelessWidget {
     this.onTap,
   }) : super(key: key);
 
-  final ArchiveModel? archive;
+  final Archive? archive;
   final VoidCallback? onTap;
 
   @override
@@ -40,11 +40,11 @@ class ArchiveTile extends StatelessWidget {
   ) {
     final now = DateTime.now();
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Title : ${archive?.name}',
+          'Title : ${archive?.name ?? 'No Title'}',
           style: context.text.titleMedium,
         ),
         Text(

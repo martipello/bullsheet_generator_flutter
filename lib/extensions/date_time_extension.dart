@@ -121,6 +121,11 @@ extension DateTimeExtension on DateTime? {
     );
   }
 
+  String id() {
+    final date = this ?? DateTime.now();
+    return '${date.year}${date.month}${date.day}${date.hour}${date.minute}${date.second}';
+  }
+
   DateTime startOfDay() {
     final date = this ?? DateTime.now();
     return DateTime.utc(

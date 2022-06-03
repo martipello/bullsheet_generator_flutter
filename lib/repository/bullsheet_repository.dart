@@ -118,10 +118,10 @@ class BullsheetRepository {
   }
 
   List<jb.Job> _createTotalJobsJobs(
-      JobSearchRequest? jobSearchRequest,
-      html.HtmlDocument _html,
-      JobSource jobSource,
-      ) {
+    JobSearchRequest? jobSearchRequest,
+    html.HtmlDocument _html,
+    JobSource jobSource,
+  ) {
     log('JOB SEARCH LIST').d('HTML ${_html.documentElement?.innerHtml}');
     var _jobs = <jb.Job>[];
     //#job-item-97580752 > div.sc-fznNTe.kxgehf > div.sc-fzooss.kBgtGS > a > h2
@@ -132,7 +132,7 @@ class BullsheetRepository {
 
     final _jobListItems = _jobListElement?.children.where(
           (element) => element.className == 'search-result',
-    ) ??
+        ) ??
         [];
 
     for (var jobItem in _jobListItems) {

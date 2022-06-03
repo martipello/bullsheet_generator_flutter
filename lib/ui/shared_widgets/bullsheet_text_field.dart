@@ -45,9 +45,7 @@ class BullsheetTextField extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType: textInputType,
       decoration: _buildInputDecoration(context),
-      onEditingComplete: textInputAction == TextInputAction.next
-          ? () => context.nextEditableTextFocus()
-          : null,
+      onEditingComplete: textInputAction == TextInputAction.next ? () => context.nextEditableTextFocus() : null,
       validator: validator != null
           ? validator
           : validatorMessage != null

@@ -1,8 +1,7 @@
-
 import 'package:rxdart/rxdart.dart';
 
 import '../api/models/api_response.dart';
-import '../api/models/archive_model.dart';
+import '../api/models/archive.dart';
 import '../repository/archive_repository.dart';
 
 class ArchivesViewModel {
@@ -10,19 +9,23 @@ class ArchivesViewModel {
 
   final ArchiveRepository archiveRepository;
 
-  final archivesStream = BehaviorSubject<ApiResponse<List<ArchiveModel>>>();
+  final archivesStream = BehaviorSubject<ApiResponse<List<Archive>>>();
 
   void getArchives() async {
     archivesStream.add(ApiResponse.loading(null));
     final archiveModelList = await archiveRepository.getArchiveModels();
-    if(archiveModelList != null){
-      archivesStream.add(ApiResponse.completed(archiveModelList));
+    if (archiveModelList != null) {
+      archivesStream.add(
+        ApiResponse.completed(archiveModelList),
+      );
     } else {
-      archivesStream.add(ApiResponse.error('Couldn\'t find archives. Please try again.'));
+      archivesStream.add(
+        ApiResponse.error('Couldn\'t find archives. Please try again.'),
+      );
     }
   }
 
-  void removeArchiveModel(ArchiveModel archiveModel) {
+  void removeArchive(Archive archiveModel) {
     var _archiveModelList = archivesStream.value?.data;
     if (_archiveModelList != null) {
       _archiveModelList.remove(archiveModel);
@@ -30,7 +33,7 @@ class ArchivesViewModel {
     }
   }
 
-  void insertArchiveModel(ArchiveModel archiveModel, int index) {
+  void insertArchive(Archive archiveModel, int index) {
     var _archiveModelList = archivesStream.value?.data;
     if (_archiveModelList != null) {
       _archiveModelList.insert(index, archiveModel);
@@ -38,7 +41,16 @@ class ArchivesViewModel {
     }
   }
 
-  void dispose () {
+  void moveArchive(Archive archiveModel, int index) {
+    var _archiveModelList = archivesStream.value?.data;
+    if (_archiveModelList != null) {
+      _archiveModelList.remove(archiveModel);
+      _archiveModelList.insert(index, archiveModel);
+      archivesStream.add(ApiResponse.completed(_archiveModelList));
+    }
+  }
+
+  void dispose() {
     archivesStream.close();
   }
 }

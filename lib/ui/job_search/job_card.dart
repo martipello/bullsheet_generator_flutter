@@ -10,7 +10,11 @@ import '../shared_widgets/bullsheet_tile.dart';
 typedef JobCallback = void Function(Job job);
 
 class JobCard extends StatelessWidget {
-  JobCard({required this.job, this.removeJob, Key? key}) : super(key: key);
+  JobCard({
+    required this.job,
+    this.removeJob,
+    Key? key,
+  }) : super(key: key);
 
   final _launchService = getIt.get<LaunchService>();
 

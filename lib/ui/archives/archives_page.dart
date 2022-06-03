@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:reorderableitemsview/reorderableitemsview.dart';
 
 import '../../api/models/api_response.dart';
-import '../../api/models/archive_model.dart';
+import '../../api/models/archive.dart';
 import '../../dependency_injection_container.dart';
 import '../../extensions/iterable_extension.dart';
 import '../../view_models/archives_view_model.dart';
-import '../dashboard.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
 import '../shared_widgets/bullsheet_loading_widget.dart';
 import 'archive_page.dart';
@@ -37,7 +36,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
       appBar: BullsheetAppBar(
         label: 'Bullsheet',
       ),
-      body: StreamBuilder<ApiResponse<List<ArchiveModel>>>(
+      body: StreamBuilder<ApiResponse<List<Archive>>>(
         stream: _archivesViewModel.archivesStream,
         builder: (context, snapshot) {
           final _status = snapshot.data?.status;
@@ -63,16 +62,13 @@ class _ArchivesPageState extends State<ArchivesPage> {
             isGrid: true,
             longPressToDrag: true,
             onReorder: (oldIndex, newIndex) {
-              _archivesViewModel.removeArchiveModel(
-                _archiveList[oldIndex],
-              );
-              _archivesViewModel.insertArchiveModel(
+              _archivesViewModel.moveArchive(
                 _archiveList[oldIndex],
                 newIndex,
               );
             },
             feedBackWidgetBuilder: (context, index, child) {
-              return Center(child: child);
+              return child;
             },
             staggeredTiles: _archiveList
                 .mapIndexed<StaggeredTileExtended>(
@@ -94,7 +90,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
   }
 
   ArchiveTile _buildArchiveTile(
-    ArchiveModel _archive,
+    Archive _archive,
   ) {
     return ArchiveTile(
       key: ValueKey(
@@ -109,5 +105,4 @@ class _ArchivesPageState extends State<ArchivesPage> {
       },
     );
   }
-
 }

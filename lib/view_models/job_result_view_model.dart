@@ -1,8 +1,9 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../api/models/api_response.dart';
-import '../api/models/archive_model.dart';
+import '../api/models/archive.dart';
 import '../api/models/job.dart';
 import '../api/models/job_search_request.dart';
 import '../extensions/date_time_extension.dart';
@@ -20,7 +21,8 @@ class JobResultViewModel {
   final BullsheetRepository bullsheetRepository;
   final ArchiveRepository archiveRepository;
 
-  final jobListStream = BehaviorSubject<ApiResponse<List<Job>>>();
+  final jobListStream = BehaviorSubject<ApiResponse<BuiltList<Job>>>();
+  String? archiveName;
 
   JobSearchRequest? jobSearchRequest;
 
@@ -30,14 +32,14 @@ class JobResultViewModel {
     if (_jobs.all((element) => element.id == Constants.errorId)) {
       jobListStream.add(ApiResponse.error('All sites had errors.'));
     } else {
-      jobListStream.add(ApiResponse.completed(_jobs));
+      jobListStream.add(ApiResponse.completed(_jobs.toBuiltList()));
     }
   }
 
   void removeJob(Job job) {
     var _jobList = jobListStream.value?.data;
     if (_jobList != null) {
-      _jobList.remove(job);
+      _jobList.toList().remove(job);
       jobListStream.add(ApiResponse.completed(_jobList));
     }
   }
@@ -45,28 +47,38 @@ class JobResultViewModel {
   void insertJob(Job job, int index) {
     var _jobList = jobListStream.value?.data;
     if (_jobList != null) {
-      _jobList.insert(index, job);
+      _jobList.toList().insert(index, job);
       jobListStream.add(ApiResponse.completed(_jobList));
     }
   }
 
-  ArchiveModel? archiveJobs() {
+  void moveJob(
+    Job job,
+    int index,
+  ) {
+    var _jobList = jobListStream.value?.data;
+    if (_jobList != null) {
+      _jobList.toList().remove(job);
+      _jobList.toList().insert(index, job);
+      jobListStream.add(ApiResponse.completed(_jobList));
+    }
+  }
+
+  Archive? archiveJobs() {
     var _jobList = jobListStream.value?.data;
     if (_jobList != null) {
       final now = DateTime.now();
-      final _id = now.toIso8601String();
-      final _archiveModel = ArchiveModel(
-            (b) => b
+      final _id = now.id();
+      final _archiveModel = Archive(
+        (b) => b
           ..id = _id
-          ..name = 'New Job List'
+          ..name = archiveName ?? 'New Job List'
           ..createdDate = now
           ..updatedDate = now
           ..color = Colors.white.value
-          ..jobList = _jobList,
+          ..jobList = _jobList.toBuilder(),
       );
-      archiveRepository.saveArchive(
-          _archiveModel
-      );
+      archiveRepository.saveArchive(_archiveModel);
       return _archiveModel;
     } else {
       return null;

@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -5,7 +6,6 @@ import '../../api/models/api_response.dart';
 import '../../api/models/job.dart';
 import '../../extensions/build_context_extension.dart';
 import '../../view_models/job_result_view_model.dart';
-import '../archives/archive_page.dart';
 import '../archives/archives_page.dart';
 import '../dashboard.dart';
 import '../shared_widgets/bullsheet_app_bar.dart';
@@ -36,13 +36,21 @@ class _JobResultsPageState extends State<JobResultsPage> {
   void initState() {
     Future.delayed(Duration.zero).then((value) {
       jobSearchResultPageArguments.jobResultViewModel?.getJobs();
+      _titleTextController.text = 'New Job List';
     });
+    addListener();
     super.initState();
+  }
+
+  void addListener() {
+    _titleTextController.addListener(() {
+      jobSearchResultPageArguments.jobResultViewModel?.archiveName = _titleTextController.text;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<ApiResponse<List<Job>>>(
+    return StreamBuilder<ApiResponse<BuiltList<Job>>>(
       stream: jobSearchResultPageArguments.jobResultViewModel?.jobListStream,
       builder: (context, snapshot) {
         return Scaffold(
@@ -60,16 +68,12 @@ class _JobResultsPageState extends State<JobResultsPage> {
   Widget _buildFloatingActionButton() {
     return FloatingActionButton(
       onPressed: () {
-        final _archive = jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
+        jobSearchResultPageArguments.jobResultViewModel?.archiveJobs();
         Navigator.of(context).popUntil(
-              (route) => route.settings.name == Dashboard.route,
+          (route) => route.settings.name == Dashboard.route,
         );
         Navigator.of(context).pushNamed(
           ArchivesPage.route,
-        );
-        Navigator.of(context).pushNamed(
-          ArchivePage.route,
-          arguments: ArchivePageArguments(_archive?.id),
         );
       },
       child: const Icon(
@@ -78,8 +82,8 @@ class _JobResultsPageState extends State<JobResultsPage> {
     );
   }
 
-  Widget _buildState(ApiResponse<List<Job>>? snapshot) {
-    final _jobList = snapshot?.data ?? [];
+  Widget _buildState(ApiResponse<BuiltList<Job>>? snapshot) {
+    final _jobList = snapshot?.data ?? BuiltList.of([]);
     final status = snapshot?.status;
     switch (status) {
       case Status.COMPLETED:
@@ -97,7 +101,26 @@ class _JobResultsPageState extends State<JobResultsPage> {
     }
   }
 
-  Widget _buildErrorWidget(ApiResponse<List<Job>>? snapshot) {
+  Widget _buildErrorWidget(ApiResponse<BuiltList<Job>>? snapshot) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        jobSearchResultPageArguments.jobResultViewModel?.getJobs();
+      },
+      child: CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            child: Center(
+              child: BullsheetErrorWidget(
+                errorMessage: snapshot?.message ?? 'All selected sites had errors.',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildJobListView(BuiltList<Job> _jobList) {
     return RefreshIndicator(
       onRefresh: () async {
         jobSearchResultPageArguments.jobResultViewModel?.getJobs();
@@ -115,29 +138,12 @@ class _JobResultsPageState extends State<JobResultsPage> {
               child: BullsheetTextField(
                 textController: _titleTextController,
                 labelText: 'Title',
-                style: context.text.titleLarge,
+                style: context.text.titleLarge?.copyWith(
+                  height: 1.4,
+                ),
               ),
             ),
           ),
-          SliverFillRemaining(
-            child: Center(
-              child: BullsheetErrorWidget(
-                errorMessage: snapshot?.message ?? 'All selected sites had errors.',
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildJobListView(List<Job> _jobList) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        jobSearchResultPageArguments.jobResultViewModel?.getJobs();
-      },
-      child: CustomScrollView(
-        slivers: [
           SliverPadding(
             padding: const EdgeInsets.all(8),
             sliver: ReorderableSliverList(
@@ -148,10 +154,7 @@ class _JobResultsPageState extends State<JobResultsPage> {
               onReorder: (oldIndex, newIndex) {
                 //TODO this is broken
                 if (newIndex > oldIndex) newIndex--;
-                jobSearchResultPageArguments.jobResultViewModel?.removeJob(
-                  _jobList[oldIndex],
-                );
-                jobSearchResultPageArguments.jobResultViewModel?.insertJob(
+                jobSearchResultPageArguments.jobResultViewModel?.moveJob(
                   _jobList[oldIndex],
                   newIndex,
                 );

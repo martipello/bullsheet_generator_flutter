@@ -1,19 +1,19 @@
-import 'package:hive/hive.dart';
+import 'package:hive_built_value/hive_built_value.dart';
 
-import '../api/models/archive_model.dart';
+import '../api/models/archive.dart';
 import '../utils/constants.dart';
 
 class ArchiveRepository {
   ArchiveRepository();
 
-  Future<Box<ArchiveModel>?> _openArchiveBox() async {
-    return Hive.openBox<ArchiveModel>(
+  Future<Box<Archive>?> _openArchiveBox() async {
+    return Hive.openBox<Archive>(
       Constants.jobBoxKey,
     );
   }
 
   Future<void> saveArchive(
-    ArchiveModel archiveModel,
+    Archive archiveModel,
   ) async {
     final box = await _openArchiveBox();
     if (box != null) {
@@ -22,7 +22,7 @@ class ArchiveRepository {
   }
 
   Future<void> deleteArchive(
-    ArchiveModel archiveModel,
+    Archive archiveModel,
   ) async {
     final box = await _openArchiveBox();
     if (box != null) {
@@ -37,7 +37,7 @@ class ArchiveRepository {
     if (box != null) {
       final _values = box.values.toList();
       final _valuesWithoutNulls = _values
-          .whereType<ArchiveModel>()
+          .whereType<Archive>()
           .where(
             (archive) =>
                 archive.name?.contains(
@@ -58,14 +58,14 @@ class ArchiveRepository {
     return Future.value(0);
   }
 
-  Future<List<ArchiveModel>?> getArchiveModels({
+  Future<List<Archive>?> getArchiveModels({
     String? search,
   }) async {
     final box = await _openArchiveBox();
     if (box != null) {
       final _values = box.values.toList();
       final _valuesWithoutNulls = _values
-          .whereType<ArchiveModel>()
+          .whereType<Archive>()
           .where(
             (archive) =>
                 archive.name?.contains(
@@ -83,10 +83,10 @@ class ArchiveRepository {
       );
       return _valuesWithoutNulls;
     }
-    return Future.value(<ArchiveModel>[]);
+    return Future.value(<Archive>[]);
   }
 
-  Future<ArchiveModel?> getArchive(
+  Future<Archive?> getArchive(
     String id,
   ) async {
     final box = await _openArchiveBox();

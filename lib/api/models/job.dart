@@ -1,6 +1,6 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_built_value/hive_built_value.dart';
 
 import 'serializers/serializers.dart';
 
@@ -8,7 +8,6 @@ part 'job.g.dart';
 
 @HiveType(typeId: 1)
 abstract class Job implements Built<Job, JobBuilder> {
-
   factory Job([void Function(JobBuilder) updates]) = _$Job;
 
   Job._();

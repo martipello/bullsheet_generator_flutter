@@ -3,7 +3,7 @@ import 'package:built_value/serializer.dart';
 import 'package:built_value/standard_json_plugin.dart';
 
 import '../api_response.dart';
-import '../archive_model.dart';
+import '../archive.dart';
 import '../error_response.dart';
 import '../job.dart';
 import '../job_search_request.dart';
@@ -15,7 +15,7 @@ part 'serializers.g.dart';
 @SerializersFor([
   //models
   ApiResponse,
-  ArchiveModel,
+  Archive,
   ErrorResponse,
   Job,
   JobSearchRequest,
